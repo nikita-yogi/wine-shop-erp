@@ -13,6 +13,9 @@ export const roleModel = {
     return prisma.roles.findUnique({ where: { uuid } });
   },
 
+  findById: (id: number) => {
+    return prisma.roles.findUnique({ where: { id } });
+  },
   findByName: (name: string) => {
     return prisma.roles.findUnique({ where: { name } });
   },
@@ -35,35 +38,3 @@ export const roleModel = {
     });
   },
 };
-
-// import prisma from "../config/prisma.js";
-// import type { Status } from "@prisma/client";
-
-// export const roleModel = {
-//   findAll: () => {
-//     return prisma.roles.findUnique({ where: { deleted_at: null } });
-//   },
-
-//  findByUuid: (uuid: string) => {
-//     return prisma.roles.findUnique({ where: { uuid} });
-//   },
-
-//   findByName: (name: string) => {
-//     return prisma.roles.findUnique({ where: { name } });
-//   },
-
-//   create: (data: { name: string }) => {
-//     return prisma.roles.create({ data });
-//   },
-
-//   update: (uuid: string, data:  UpdateRoleDTO ) => {
-//     return prisma.roles.update({ where: { uuid }, data ,});
-//   },
-
-//   softDelete: (uuid: string) => {
-//     return prisma.roles.update({
-//       where: { uuid },
-//       data: { deleted_at: new Date() },
-//     });
-//   },
-// };
