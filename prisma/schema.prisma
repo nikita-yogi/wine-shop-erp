@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model roles {
+  id         Int       @id @default(autoincrement())
+  uuid       String    @unique @default(uuid()) @db.Char(36)
+  name       String    @unique @db.VarChar(50)
+  status     Status    @default(active)
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  users      users[]
+
+  @@map("roles")
+}
+
+model permission {
+  id               Int                @id @default(autoincrement())
+  uuid             String             @unique @default(uuid()) @db.Char(36)
+  name             String             @unique @db.VarChar(100)
+  group            String?            @db.VarChar(50)
+  status           Status             @default(active)
+  description      String?            @db.Text
+  created_at       DateTime           @default(now())
+  deleted_at       DateTime?
+  user_permissions user_permissions[]
+
+  @@map("permissions")
+}
+
+model users {
+  id            Int                @id @default(autoincrement())
+  uuid          String             @unique @default(uuid()) @db.Char(36)
+  name          String             @db.VarChar(150)
+  email         String             @unique @db.VarChar(150)
+  phone         String?            @unique @db.VarChar(20)
+  address       String?            @db.VarChar(150)
+  city          String?            @db.VarChar(100)
+  state         String?            @db.VarChar(100)
+  password      String             @db.Text
+  date_of_birth DateTime?          @db.Date
+  role_id       Int?
+  status        Status             @default(active)
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @updatedAt
+  deleted_at    DateTime?
+  sessions      session[]
+  meta          user_meta[]
+  permissions   user_permissions[]
+  role          roles?             @relation(fields: [role_id], references: [id], map: "users_roleId_fkey")
+
+  @@index([role_id], map: "users_roleId_idx")
+  @@map("users")
+}
+
+model user_meta {
+  id         Int       @id @default(autoincrement())
+  uuid       String    @unique @default(uuid()) @db.Char(36)
+  user_id    Int
+  meta_key   String    @db.VarChar(100)
+  meta_value String?   @db.Text
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_meta_userId_fkey")
+
+  @@index([user_id], map: "user_meta_userId_fkey")
+  @@map("user_meta")
+}
+
+model user_permissions {
+  id            Int        @id @default(autoincrement())
+  uuid          String     @unique @default(uuid()) @db.Char(36)
+  user_id       Int
+  permission_id Int
+  created_at    DateTime   @default(now())
+  deleted_at    DateTime?
+  permission    permission @relation(fields: [permission_id], references: [id], onDelete: Cascade, map: "user_permissions_permissionId_fkey")
+  user          users      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_permissions_userId_fkey")
+
+  @@unique([user_id, permission_id], map: "uq_user_permission")
+  @@index([permission_id], map: "user_permissions_permissionId_fkey")
+  @@map("user_permissions")
+}
+
+model session {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique(map: "user_sessions_uuid_key") @default(uuid()) @db.Char(36)
+  user_id       Int
+  session_token String    @unique(map: "user_sessions_sessionToken_key") @db.VarChar(512)
+  ip_address    String?   @db.VarChar(45)
+  user_agent    String?   @db.Text
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  revoked_at    DateTime?
+  expires_at    DateTime
+  deleted_at    DateTime?
+  user          users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_sessions_userId_fkey")
+
+  @@index([user_id], map: "idx_sessions_user")
+  @@index([is_active], map: "idx_sessions_active")
+  @@map("session")
+}
+
+enum Status {
+  active
+  inactive
+}
