@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import storeModel from "../models/store.ts";
+import storeModel from "../models/store.js";
 import { ApiError } from "../utils/ApiError.js";
 
 import type {
@@ -8,13 +8,52 @@ import type {
   StoreFilters,
   PaginationParams,
 } from "../types/store.js";
+import type { stores_status } from "@prisma/client";
 
 const VALID_STATUSES = [
   "open",
   "closed",
   "suspended",
   "license_expired",
-];
+] as const;
+
+const isStoreStatus = (value: string): value is stores_status =>
+  VALID_STATUSES.includes(value as stores_status);
+
+const getSingleQueryValue = (
+  req: Request,
+  key: string
+): string | undefined => {
+  const value = req.query[key];
+
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    throw new ApiError(400, `${key} must be a single value`);
+  }
+
+  return value;
+};
+
+const getPositiveIntegerQuery = (
+  req: Request,
+  key: "page" | "limit",
+  defaultValue: number
+): number => {
+  const value = getSingleQueryValue(req, key);
+
+  if (value === undefined) {
+    return defaultValue;
+  }
+
+  if (!/^\d+$/.test(value) || Number(value) < 1) {
+    throw new ApiError(400, `${key} must be a positive integer`);
+  }
+
+  return Number(value);
+};
 
 /**
  * Convert route param into a clean UUID string.
@@ -71,7 +110,7 @@ const create = async (
     const input = req.body as CreateStoreDTO;
 
     // Business rule
-    if (input.status && !VALID_STATUSES.includes(input.status)) {
+    if (input.status && !isStoreStatus(input.status)) {
       throw new ApiError(400, "Invalid status value");
     }
 
@@ -102,14 +141,21 @@ const list = async (
   next: NextFunction
 ) => {
   try {
+    const status = getSingleQueryValue(req, "status");
+    const city = getSingleQueryValue(req, "city");
+
+    if (status !== undefined && !isStoreStatus(status)) {
+      throw new ApiError(400, "Invalid status value");
+    }
+
     const filters: StoreFilters = {
-      status: req.query.status as string | undefined,
-      city: req.query.city as string | undefined,
+      ...(status !== undefined && { status }),
+      ...(city !== undefined && { city }),
     };
 
     const pagination: PaginationParams = {
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 20,
+      page: getPositiveIntegerQuery(req, "page", 1),
+      limit: getPositiveIntegerQuery(req, "limit", 20),
     };
 
     // Business rule: pagination limits
@@ -188,7 +234,7 @@ const update = async (
     }
 
     // Business rule
-    if (input.status && !VALID_STATUSES.includes(input.status)) {
+    if (input.status && !isStoreStatus(input.status)) {
       throw new ApiError(400, "Invalid status value");
     }
 

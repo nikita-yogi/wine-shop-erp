@@ -26,7 +26,9 @@ export const createStoreSchema = z.object({
   tax_rate: z.number().min(0).max(100).optional(),
 });
 
-export const updateStoreSchema = createStoreSchema.partial();
+export const updateStoreSchema = createStoreSchema
+  .partial()
+  .extend({ expiry_date: z.iso.date().nullable().optional() });
 
 export const storeParamsSchema = z.object({
   uuid: z.string().uuid(),

@@ -15,11 +15,14 @@ export interface CreateStoreDTO {
   tax_rate?: number;   
 }
 
-export interface UpdateStoreDTO extends Partial<CreateStoreDTO> {}
+export interface UpdateStoreDTO
+  extends Omit<Partial<CreateStoreDTO>, "expiry_date"> {
+  expiry_date?: string | null;
+}
 
 export interface StoreFilters {
   city?: string;
-  status?: string;
+  status?: stores_status;
 }
 
 export interface PaginationParams {

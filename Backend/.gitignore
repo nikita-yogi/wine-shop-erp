@@ -1,7 +1,0 @@
-node_modules/
-.env
-prisma/migration/schema.prisma
-.agents/
-.claude/
-.windsurf/
-dist/

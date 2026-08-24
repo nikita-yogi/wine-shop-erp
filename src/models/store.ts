@@ -1,19 +1,16 @@
-import prisma from "../config/prismaClient.ts";
+import { Prisma } from "@prisma/client";
+import prisma from "../config/prisma.js";
 import type {
   CreateStoreDTO,
   UpdateStoreDTO,
   StoreFilters,
-} from "../types/store.ts";
+} from "../types/store.js";
 
-const buildWhere = (filters: StoreFilters) => ({
+const buildWhere = (filters: StoreFilters): Prisma.storesWhereInput => ({
   deleted_at: null,
-  ...(filters.status && { status: filters.status as any }),
-  ...(filters.city && { city: filters.city }),
+  ...(filters.status !== undefined && { status: filters.status }),
+  ...(filters.city !== undefined && { city: filters.city }),
 });
-
-// const create = (data: CreateStoreDTO) => {
-//   return prisma.stores.create({ data: data as any });
-// };
 
 const create = (data: CreateStoreDTO) => {
   const storeData = {
@@ -23,9 +20,7 @@ const create = (data: CreateStoreDTO) => {
       : null,
   };
 
-  return prisma.stores.create({
-    data: storeData as any,
-  });
+  return prisma.stores.create({ data: storeData });
 };
 
 const findAll = (filters: StoreFilters, skip: number, take: number) => {
@@ -48,9 +43,18 @@ const findByUuid = (uuid: string) => {
 };
 
 const update = (uuid: string, data: UpdateStoreDTO) => {
+  const { expiry_date, ...storeFields } = data;
+
   return prisma.stores.update({
     where: { uuid },
-    data: data as any,
+    data: {
+      ...storeFields,
+      ...(expiry_date !== undefined && {
+        expiry_date: expiry_date
+          ? new Date(`${expiry_date}T00:00:00.000Z`)
+          : null,
+      }),
+    },
   });
 };
 
