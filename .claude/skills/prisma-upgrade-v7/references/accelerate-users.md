@@ -1,4 +1,3 @@
-# Prisma Accelerate Users
 
 Special migration instructions for users of Prisma Accelerate or Prisma Postgres with `prisma://` or `prisma+postgres://` URLs.
 

@@ -6,9 +6,11 @@ import storeRoutes from "./store.js";
 
 const router = Router();
 
-
+//auth routes
 router.use("/auth", authRoutes);
-router.use("/users/profile", userRoutes);
+// User routes
+router.use("/users", userRoutes);
+//role
 router.use("/roles", roleRoutes);
 router.use("/stores", storeRoutes);
 
