@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import type { RegisterDTO, LoginDTO } from "../types/user.js";
 import { authModel, } from "../models/auth.js";
 import {roleModel } from "../models/role.js";
+import { assignDefaultPermissions } from "../utils/assignDefaultPermissions.js"; 
 
 import {
   generateAccessToken,
@@ -54,6 +55,8 @@ export async function register(req: Request, res: Response) {
       password: hashedPassword,
       role_id: ownerRole.id,
     });
+    //owner ko default permissions do
+     await assignDefaultPermissions(user.id, ownerRole.name);
 
     return res.status(201).json({
       message: "Registration successful",

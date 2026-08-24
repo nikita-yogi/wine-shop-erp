@@ -1,0 +1,56 @@
+export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
+  owner: [
+    "manage_users",
+    "view_users",
+    "manage_roles",
+    "manage_stores",
+    "view_stores",
+    "manage_products",
+    "view_products",
+    "manage_categories",
+    "manage_brands",
+    "manage_suppliers",
+    "view_suppliers",
+    "manage_inventory",
+    "view_inventory",
+    "manage_purchases",
+    "view_purchases",
+    "manage_orders",
+    "view_orders",
+    "manage_payments",
+    "view_payments",
+    "sell_product",
+    "view_reports",
+  ],
+
+  manager: [
+    "view_stores",
+    "manage_products",
+    "view_products",
+    "manage_inventory",
+    "view_inventory",
+    "manage_orders",
+    "view_orders",
+    "view_payments",
+    "sell_product",
+    "view_reports",
+  ],
+
+  shopkeeper: [
+    "view_products",
+    "manage_inventory",
+    "view_inventory",
+    "manage_orders",
+    "sell_product",
+  ],
+
+  staff: [
+    "view_products",
+    "sell_product",
+  ],
+
+  cashier: [
+    "sell_product",
+    "view_payments",
+  ],
+};

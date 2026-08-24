@@ -17,6 +17,22 @@ export const userModel = {
     });
   },
 
+  createUserWithRole: (data: {
+    name: string;
+    email: string;
+    password: string;
+    role_id: number;
+  }) => {
+    return prisma.users.create({ data });
+  },
+  findAllUsers: () => {
+    return prisma.users.findMany({
+        where: {
+        deleted_at: null, 
+      },
+      include: { role: true },
+    });
+  },
   getUserProfile: (userUuid: string) => {
     return prisma.users.findUnique({
       where: { uuid: userUuid },
@@ -37,6 +53,7 @@ export const userModel = {
       },
     });
   },
+
   delteUsereProfile: (userUuid: string) => {
     return prisma.users.update({
       where: { uuid: userUuid },
