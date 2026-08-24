@@ -15,27 +15,27 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizeRole("Owner", "manager"),
+  authorizeRole("owner", "manager"),
   validate(createStoreSchema),
   storeController.create
 );
 
 router.get(
   "/",
-  authorizeRole("Owner", "manager", "shopkeeper", "staff"),
+  authorizeRole("owner", "manager", "shopkeeper", "staff"),
   storeController.list
 );
 
 router.get(
   "/:uuid",
-  authorizeRole("Owner", "manager", "shopkeeper", "staff"),
+  authorizeRole("owner", "manager", "shopkeeper", "staff"),
   validate(storeParamsSchema, "params"),
   storeController.getStore
 );
 
 router.patch(
   "/:uuid",
-  authorizeRole("Owner", "manager"),
+  authorizeRole("owner", "manager"),
   validate(storeParamsSchema, "params"),
   validate(updateStoreSchema),
   storeController.update
@@ -43,7 +43,7 @@ router.patch(
 
 router.delete(
   "/:uuid",
-  authorizeRole("Owner"),
+  authorizeRole("owner"),
   validate(storeParamsSchema, "params"),
   storeController.remove
 );

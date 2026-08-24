@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  // url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model roles {
@@ -125,9 +125,148 @@ model stores {
   updated_at  DateTime      @updatedAt
   deleted_at  DateTime?
 
+    store_products        store_products[]
+
   @@index([status], map: "idx_stores_status")
   @@index([city], map: "idx_stores_city")
   @@map("stores")
+}
+
+model brands {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  name        String  @unique @db.VarChar(100)
+  description String? @db.VarChar(255)
+
+  status Status @default(active)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  products    products[]
+
+  @@map("brands")
+}
+
+model categories {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  name        String  @unique @db.VarChar(100)
+  description String? @db.VarChar(255)
+
+  status Status @default(active)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  products    products[]
+
+  @@map("categories")
+}
+
+model product_types {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  name String @unique @db.VarChar(100)
+
+  volume_ml  Decimal? @db.Decimal(10, 2)
+  unit       String?  @db.VarChar(50)
+  unit_value Decimal? @db.Decimal(10, 2)
+
+  status Status @default(active)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  products   products[]
+
+  @@map("product_types")
+}
+
+model products {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  name        String  @db.VarChar(150)
+  description String? @db.VarChar(255)
+
+  sku     String  @unique @db.VarChar(100)
+  barcode String? @unique @db.VarChar(100)
+
+  brand_id        Int
+  category_id     Int
+  product_type_id Int
+
+  status Status @default(active)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+brand brands @relation(fields: [brand_id], references: [id], onDelete: Restrict)
+
+category categories @relation(fields: [category_id], references: [id], onDelete: Restrict)
+
+product_type product_types @relation(fields: [product_type_id], references: [id], onDelete: Restrict)
+
+  product_meta    product_meta[]
+
+  store_products  store_products[]
+
+
+  @@index([brand_id])
+  @@index([category_id])
+  @@index([product_type_id])
+  @@index([name])
+  @@map("products")
+}
+
+model product_meta {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  product_id Int
+
+  meta_key   String  @db.VarChar(100)
+  meta_value String? @db.Text
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, meta_key])
+  @@index([product_id])
+  @@map("product_meta")
+}
+
+model store_products {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid()) @db.Char(36)
+
+  store_id   Int
+  product_id Int
+
+  stock Decimal @default(0) @db.Decimal(12, 2)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  store stores @relation(fields: [store_id],references: [id],onDelete: Restrict)
+
+  product products @relation(fields: [product_id],references: [id],onDelete: Restrict)
+
+  @@unique([store_id, product_id])
+  @@index([product_id])
+  @@map("store_products")
 }
 
 enum Status {

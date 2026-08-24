@@ -15,7 +15,6 @@ import {
 
 
 // REGISTER
-
 export async function register(req: Request, res: Response) {
   try {
     const data: RegisterDTO = req.body;
@@ -40,11 +39,11 @@ export async function register(req: Request, res: Response) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // 4. Owner role find
-    const ownerRole = await roleModel.findByName("Owner");
+    const ownerRole = await roleModel.findByName("owner");
 
     if (!ownerRole) {
       return res.status(500).json({
-        error: "Owner role not configured",
+        error: "owner role not configured",
       });
     }
 
