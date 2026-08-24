@@ -9,7 +9,7 @@ async function main() {
   // ---------------------------------------
   await prisma.roles.createMany({
     data: [
-      { name: "owner" },
+      { name: "Owner" },
       { name: "manager" },
       { name: "shopkeeper" },
       { name: "staff" },
