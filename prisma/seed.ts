@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -9,7 +8,7 @@ async function main() {
   // ---------------------------------------
   await prisma.roles.createMany({
     data: [
-      { name: "Owner" },
+      { name: "owner" },
       { name: "manager" },
       { name: "shopkeeper" },
       { name: "staff" },
@@ -56,7 +55,3 @@ async function main() {
 main()
   .catch((e) => console.error(e))
   .finally(async () => await prisma.$disconnect());
-
-
-
-
