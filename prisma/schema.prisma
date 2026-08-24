@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 model roles {
@@ -106,7 +106,38 @@ model session {
   @@map("session")
 }
 
+model stores {
+  id          Int           @id @default(autoincrement())
+  uuid        String        @unique @default(uuid()) @db.Char(36)
+  name        String        @db.VarChar(150)
+  code        String        @unique @db.VarChar(50)
+  license_no  String?       @unique @db.VarChar(100)
+  expiry_date DateTime?     @db.Date
+  address     String?       @db.VarChar(255)
+  city        String?       @db.VarChar(100)
+  state       String?       @db.VarChar(100)
+  pincode     String?       @db.VarChar(10)
+  status      stores_status @default(open)
+  phone_no    String?       @db.VarChar(20)
+  email       String?       @db.VarChar(150)
+  tax_rate    Decimal?      @db.Decimal(5, 2)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  deleted_at  DateTime?
+
+  @@index([status], map: "idx_stores_status")
+  @@index([city], map: "idx_stores_city")
+  @@map("stores")
+}
+
 enum Status {
   active
   inactive
+}
+
+enum stores_status {
+  open
+  closed
+  suspended
+  license_expired
 }

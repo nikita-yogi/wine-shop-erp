@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 import prisma from "./src/config/prisma.js";
+import { errorHandler } from "./src/middleware/errorHandler.js";
 import mainRoute from "./src/routes/routes.js";
 
 const app = express();
@@ -35,6 +36,7 @@ app.get("/api/test-db", async (req, res) => {
 
 // Main Routes
 app.use("/api", mainRoute);
+app.use(errorHandler);
 
 
 
