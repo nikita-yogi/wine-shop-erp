@@ -21,6 +21,10 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "view_payments",
     "sell_product",
     "view_reports",
+    "manage_categories",
+    "view_categories",
+    "manage_product_types",
+    "view_product_types",
   ],
 
   manager: [
@@ -44,13 +48,7 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "sell_product",
   ],
 
-  staff: [
-    "view_products",
-    "sell_product",
-  ],
+  staff: ["view_products", "sell_product"],
 
-  cashier: [
-    "sell_product",
-    "view_payments",
-  ],
+  cashier: ["sell_product", "view_payments"],
 };

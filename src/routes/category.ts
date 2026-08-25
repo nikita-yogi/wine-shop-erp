@@ -3,7 +3,7 @@ import { Router } from "express";
 import categoryController from "../controllers/category.js";
 
 import { authMiddleware } from "../middleware/auth.js";
-import { authorizeRole } from "../middleware/authorizeRole.js";
+import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 
 import {
@@ -18,37 +18,27 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_categories"),
   validate(createCategorySchema),
   categoryController.create
 );
 
 router.get(
   "/",
-  authorizeRole(
-    "owner",
-    "manager",
-    "shopkeeper",
-    "staff"
-  ),
+  authorizePermission("view_categories"),
   categoryController.list
 );
 
 router.get(
   "/:uuid",
-  authorizeRole(
-    "owner",
-    "manager",
-    "shopkeeper",
-    "staff"
-  ),
+  authorizePermission("view_categories"),
   validate(categoryParamsSchema, "params"),
   categoryController.getCategory
 );
 
 router.patch(
   "/:uuid",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_categories"),
   validate(categoryParamsSchema, "params"),
   validate(updateCategorySchema),
   categoryController.update
@@ -56,7 +46,7 @@ router.patch(
 
 router.delete(
   "/:uuid",
-  authorizeRole("owner"),
+  authorizePermission("manage_categories"),
   validate(categoryParamsSchema, "params"),
   categoryController.remove
 );
