@@ -15,7 +15,7 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizePermission("manage_brands"),
+  authorizePermission("manage_stores"),
   validate(createStoreSchema),
   storeController.create
 );
@@ -35,7 +35,7 @@ router.get(
 
 router.patch(
   "/:uuid",
-  authorizePermission("manage_brands"),
+  authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
   validate(updateStoreSchema),
   storeController.update
@@ -43,7 +43,7 @@ router.patch(
 
 router.delete(
   "/:uuid",
-  authorizePermission("manage_brands"),
+  authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
   storeController.remove
 );
