@@ -105,6 +105,24 @@ CREATE TABLE `session` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `password_otp` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `otp` VARCHAR(6) NOT NULL,
+    `is_used` BOOLEAN NOT NULL DEFAULT false,
+    `expires_at` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `deleted_at` DATETIME(3) NULL,
+    `attempts` INTEGER NOT NULL DEFAULT 0,
+    `blocked_until` DATETIME(3) NULL,
+
+    INDEX `password_otp_user_id_idx`(`user_id`),
+    INDEX `password_otp_email_idx`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `stores` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
@@ -256,6 +274,9 @@ ALTER TABLE `user_permissions` ADD CONSTRAINT `user_permissions_userId_fkey` FOR
 
 -- AddForeignKey
 ALTER TABLE `session` ADD CONSTRAINT `user_sessions_userId_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `password_otp` ADD CONSTRAINT `password_otp_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `products` ADD CONSTRAINT `products_brand_id_fkey` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

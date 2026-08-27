@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import prisma from "./src/config/prisma.js";
 import { errorHandler } from "./src/middleware/errorHandler.js";
 import mainRoute from "./src/routes/routes.js";
-
+import { globalLimiter } from "./src/middleware/rateLimiter.js";
 const app = express();
 
 
@@ -13,6 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+//rate limiting
+app.use(globalLimiter);
 
 // Database test
 app.get("/api/test-db", async (req, res) => {

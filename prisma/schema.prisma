@@ -54,6 +54,8 @@ model users {
   permissions   user_permissions[]
   role          roles?             @relation(fields: [role_id], references: [id], map: "users_roleId_fkey")
 
+  password_otps password_otp[]
+
   @@index([role_id], map: "users_roleId_idx")
   @@map("users")
 }
@@ -106,6 +108,25 @@ model session {
   @@map("session")
 }
 
+model password_otp {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  email         String    @db.VarChar(255)
+  otp           String    @db.VarChar(6)
+  is_used       Boolean   @default(false)
+  expires_at    DateTime
+  created_at    DateTime  @default(now())
+  deleted_at    DateTime?
+  attempts      Int       @default(0)
+  blocked_until DateTime?
+
+  // Relation with existing users table (Assuming model name is 'users')
+  user users @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([email])
+}
+
 model stores {
   id          Int           @id @default(autoincrement())
   uuid        String        @unique @default(uuid()) @db.Char(36)
@@ -125,7 +146,7 @@ model stores {
   updated_at  DateTime      @updatedAt
   deleted_at  DateTime?
 
-    store_products        store_products[]
+  store_products store_products[]
 
   @@index([status], map: "idx_stores_status")
   @@index([city], map: "idx_stores_city")
@@ -145,7 +166,7 @@ model brands {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  products    products[]
+  products products[]
 
   @@map("brands")
 }
@@ -163,7 +184,7 @@ model categories {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  products    products[]
+  products products[]
 
   @@map("categories")
 }
@@ -184,7 +205,7 @@ model product_types {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  products   products[]
+  products products[]
 
   @@map("product_types")
 }
@@ -209,16 +230,15 @@ model products {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-brand brands @relation(fields: [brand_id], references: [id], onDelete: Restrict)
+  brand brands @relation(fields: [brand_id], references: [id], onDelete: Restrict)
 
-category categories @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  category categories @relation(fields: [category_id], references: [id], onDelete: Restrict)
 
-product_type product_types @relation(fields: [product_type_id], references: [id], onDelete: Restrict)
+  product_type product_types @relation(fields: [product_type_id], references: [id], onDelete: Restrict)
 
-  product_meta    product_meta[]
+  product_meta product_meta[]
 
-  store_products  store_products[]
-
+  store_products store_products[]
 
   @@index([brand_id])
   @@index([category_id])
@@ -240,7 +260,7 @@ model product_meta {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@unique([product_id, meta_key])
   @@index([product_id])
@@ -260,9 +280,9 @@ model store_products {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  store stores @relation(fields: [store_id],references: [id],onDelete: Restrict)
+  store stores @relation(fields: [store_id], references: [id], onDelete: Restrict)
 
-  product products @relation(fields: [product_id],references: [id],onDelete: Restrict)
+  product products @relation(fields: [product_id], references: [id], onDelete: Restrict)
 
   @@unique([store_id, product_id])
   @@index([product_id])

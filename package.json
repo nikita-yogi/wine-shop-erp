@@ -26,8 +26,10 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.23.3",
+    "nodemailer": "^9.0.5",
     "nodemon": "^3.1.14",
     "zod": "^4.4.3"
   },
@@ -37,12 +39,13 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.2.0",
+    "@types/nodemailer": "^8.0.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   },
   "prisma": {
-  "seed": "tsx prisma/seed.ts"
-}
+    "seed": "tsx prisma/seed.ts"
+  }
 }
