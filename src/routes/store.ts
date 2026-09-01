@@ -1,7 +1,7 @@
 import { Router } from "express";
 import storeController from "../controllers/store.js";
 import { authMiddleware } from "../middleware/auth.js";
-import { authorizeRole } from "../middleware/authorizeRole.js";
+import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 import {
   createStoreSchema,
@@ -15,27 +15,27 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_stores"),
   validate(createStoreSchema),
   storeController.create
 );
 
 router.get(
   "/",
-  authorizeRole("owner", "manager", "shopkeeper", "staff"),
+  authorizePermission("view_stores"),
   storeController.list
 );
 
 router.get(
   "/:uuid",
-  authorizeRole("owner", "manager", "shopkeeper", "staff"),
+  authorizePermission("view_stores"),
   validate(storeParamsSchema, "params"),
   storeController.getStore
 );
 
 router.patch(
   "/:uuid",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
   validate(updateStoreSchema),
   storeController.update
@@ -43,7 +43,7 @@ router.patch(
 
 router.delete(
   "/:uuid",
-  authorizeRole("owner"),
+  authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
   storeController.remove
 );

@@ -3,7 +3,7 @@ import { Router } from "express";
 import productTypeController from "../controllers/productType.js";
 
 import { authMiddleware } from "../middleware/auth.js";
-import { authorizeRole } from "../middleware/authorizeRole.js";
+import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 
 import {
@@ -19,7 +19,7 @@ router.use(authMiddleware);
 // CREATE
 router.post(
   "/",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_product_types"),
   validate(createProductTypeSchema),
   productTypeController.create
 );
@@ -27,14 +27,14 @@ router.post(
 // LIST
 router.get(
   "/",
-  authorizeRole("owner", "manager", "shopkeeper", "staff"),
+  authorizePermission("view_product_types"),
   productTypeController.list
 );
 
 // GET SINGLE
 router.get(
   "/:uuid",
-  authorizeRole("owner", "manager", "shopkeeper", "staff"),
+  authorizePermission("view_product_types"),
   validate(productTypeParamsSchema, "params"),
   productTypeController.getProductType
 );
@@ -42,7 +42,7 @@ router.get(
 // UPDATE
 router.patch(
   "/:uuid",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_product_types"),
   validate(productTypeParamsSchema, "params"),
   validate(updateProductTypeSchema),
   productTypeController.update
@@ -51,7 +51,7 @@ router.patch(
 // DELETE
 router.delete(
   "/:uuid",
-  authorizeRole("owner"),
+  authorizePermission("manage_product_types"),
   validate(productTypeParamsSchema, "params"),
   productTypeController.remove
 );
