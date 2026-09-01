@@ -83,11 +83,7 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
       data: brand,
     });
   } catch (error) {
-    try {
-      handleUniqueError(error);
-    } catch (handledError) {
-      next(handledError);
-    }
+    next(handleUniqueError(error));
   }
 };
 
