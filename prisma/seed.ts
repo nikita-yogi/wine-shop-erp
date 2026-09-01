@@ -45,6 +45,9 @@ async function main() {
       { name: "view_payments", group: "payments" },
       { name: "sell_product", group: "sales" },
       { name: "view_reports", group: "reports" },
+      { name: "view_categories", group: "products" },
+      { name: "manage_product_types", group: "products" },
+      { name: "view_product_types", group: "products" },
     ],
     skipDuplicates: true,
   });

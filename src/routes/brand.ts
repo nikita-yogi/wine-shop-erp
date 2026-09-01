@@ -3,7 +3,7 @@ import { Router } from "express";
 import brandController from "../controllers/brand.js";
 
 import { authMiddleware } from "../middleware/auth.js";
-import { authorizeRole } from "../middleware/authorizeRole.js";
+import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 
 import {
@@ -18,56 +18,33 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizeRole("owner", "manager"),
+  authorizePermission("manage_brands"),
   validate(createBrandSchema),
-  brandController.create
+  brandController.create,
 );
 
-router.get(
-  "/",
-  authorizeRole(
-    "owner",
-    "manager",
-    "shopkeeper",
-    "staff"
-  ),
-  brandController.list
-);
+router.get("/", authorizePermission("manage_brands"), brandController.list);
 
 router.get(
   "/:uuid",
-  authorizeRole(
-    "owner",
-    "manager",
-    "shopkeeper",
-    "staff"
-  ),
-  validate(
-    brandParamsSchema,
-    "params"
-  ),
-  brandController.getBrand
+  authorizePermission("manage_brands"),
+  validate(brandParamsSchema, "params"),
+  brandController.getBrand,
 );
 
 router.patch(
   "/:uuid",
-  authorizeRole("owner", "manager"),
-  validate(
-    brandParamsSchema,
-    "params"
-  ),
+  authorizePermission("manage_brands"),
+  validate(brandParamsSchema, "params"),
   validate(updateBrandSchema),
-  brandController.update
+  brandController.update,
 );
 
 router.delete(
   "/:uuid",
-  authorizeRole("owner"),
-  validate(
-    brandParamsSchema,
-    "params"
-  ),
-  brandController.remove
+  authorizePermission("manage_brands"),
+  validate(brandParamsSchema, "params"),
+  brandController.remove,
 );
 
 export default router;
