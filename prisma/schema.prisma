@@ -141,16 +141,15 @@ model stores {
   status      stores_status @default(open)
   phone_no    String?       @db.VarChar(20)
   email       String?       @db.VarChar(150)
-  tax_rate    Decimal?      @db.Decimal(5, 2)
+  tax_rate    Int           @default(0)
   created_at  DateTime      @default(now())
   updated_at  DateTime      @updatedAt
   deleted_at  DateTime?
 
-  store_products        store_products[]
-  store_product_batches store_product_batches[]
-  audit_logs            audit_logs[]
-  orders                orders[]
-  purchase_orders       purchase_orders[]
+  store_products  store_products[]
+  audit_logs      audit_logs[]
+  orders          orders[]
+  purchase_orders purchase_orders[]
 
   @@index([status], map: "idx_stores_status")
   @@index([city], map: "idx_stores_city")
@@ -244,8 +243,6 @@ model products {
 
   store_products store_products[]
 
-  store_product_batches store_product_batches[]
-
   purchase_order_items purchase_order_items[]
 
   @@index([brand_id])
@@ -282,8 +279,6 @@ model store_products {
   store_id   Int
   product_id Int
 
-  stock Decimal @default(0) @db.Decimal(12, 2)
-
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -293,6 +288,8 @@ model store_products {
   store stores @relation(fields: [store_id], references: [id], onDelete: Restrict)
 
   product products @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  store_product_batches store_product_batches[]
 
   @@unique([store_id, product_id])
   @@index([product_id])
@@ -304,13 +301,12 @@ model store_product_batches {
   uuid String @unique @default(uuid()) @db.Char(36)
 
   batch_number String @db.VarChar(100)
-  product_id   Int
-  store_id     Int
+
+  store_product_id Int
 
   purchase_price Decimal @db.Decimal(12, 2)
   selling_price  Decimal @db.Decimal(12, 2)
-  tax_rate       Decimal @default(0.00) @db.Decimal(5, 2)
-  batch_quantity Decimal @default(0) @db.Decimal(12, 2)
+  quantity       Decimal @default(0) @db.Decimal(12, 2)
 
   expiry_date      DateTime? @db.Date
   manufacture_date DateTime? @db.Date
@@ -320,16 +316,16 @@ model store_product_batches {
   created_at DateTime  @default(now())
   deleted_at DateTime?
 
-  suppliers            suppliers[]
+  supplier suppliers? @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
+
+  store_product store_products @relation(fields: [store_product_id], references: [id], onDelete: Restrict)
+
   order_items          order_items[]
   purchase_order_items purchase_order_items[]
 
-  product products @relation(fields: [product_id], references: [id], onDelete: Restrict, map: "fk_store_product_batches_product")
-
-  store stores @relation(fields: [store_id], references: [id], onDelete: Restrict, map: "fk_store_product_batches_store")
-
-  @@index([product_id], map: "fk_store_product_batches_product")
-  @@index([store_id], map: "fk_store_product_batches_store")
+  @@unique([store_product_id, batch_number])
+  @@index([store_product_id])
+  @@index([supplier_id])
   @@index([batch_number])
   @@map("store_product_batches")
 }

@@ -1,7 +1,7 @@
 export interface CreateStoreProductBatchDTO {
   store_uuid: string;
   product_uuid: string;
-  batch_number: string;
+  batch_number: string ;
   purchase_price: number;
   selling_price: number;
   tax_rate?: number;

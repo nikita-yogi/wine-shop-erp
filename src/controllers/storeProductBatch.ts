@@ -6,9 +6,12 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/sendSuccess.js";
 import { getParamId } from "../utils/getParamId.js";
-import type { CreateStoreProductBatchDTO, UpdateStoreProductBatchDTO } from "../types/storeProductBatch.js";
+import type {
+  CreateStoreProductBatchDTO,
+  UpdateStoreProductBatchDTO,
+} from "../types/storeProductBatch.js";
 
-const toDate = (v?: string | null) => (v === undefined ? undefined : v ? new Date(v) : null);
+const toDate = (v: string | null): Date | null => (v ? new Date(v) : null);
 
 const create = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as CreateStoreProductBatchDTO;
@@ -25,10 +28,15 @@ const create = asyncHandler(async (req: Request, res: Response) => {
     batch_number: input.batch_number,
     purchase_price: input.purchase_price,
     selling_price: input.selling_price,
+
+     ...(input.tax_rate !== undefined && {
     tax_rate: input.tax_rate,
+  }),
+
     batch_quantity: input.batch_quantity,
-    expiry_date: toDate(input.expiry_date) ?? null,
-    manufacture_date: toDate(input.manufacture_date) ?? null,
+    expiry_date: toDate(input.expiry_date ?? null),
+
+    manufacture_date: toDate(input.manufacture_date ?? null),
   });
 
   return sendSuccess(res, 201, batch);
@@ -39,8 +47,12 @@ const list = asyncHandler(async (req: Request, res: Response) => {
   const where = {
     deleted_at: null,
     ...(typeof q.store_uuid === "string" && { store: { uuid: q.store_uuid } }),
-    ...(typeof q.product_uuid === "string" && { product: { uuid: q.product_uuid } }),
-    ...(typeof q.batch_number === "string" && { batch_number: { contains: q.batch_number } }),
+    ...(typeof q.product_uuid === "string" && {
+      product: { uuid: q.product_uuid },
+    }),
+    ...(typeof q.batch_number === "string" && {
+      batch_number: { contains: q.batch_number },
+    }),
     ...(q.expired === "true" && { expiry_date: { lt: new Date() } }),
   };
 
@@ -53,7 +65,12 @@ const list = asyncHandler(async (req: Request, res: Response) => {
     storeProductBatchModel.count(where),
   ]);
 
-  return sendSuccess(res, 200, data, { total, page, limit, totalPages: Math.ceil(total / limit) });
+  return sendSuccess(res, 200, data, {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  });
 });
 
 const getOne = asyncHandler(async (req: Request, res: Response) => {
@@ -64,11 +81,45 @@ const getOne = asyncHandler(async (req: Request, res: Response) => {
 
 const update = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as UpdateStoreProductBatchDTO;
-  const batch = await storeProductBatchModel.update(getParamId(req), {
-    ...input,
-    expiry_date: toDate(input.expiry_date),
-    manufacture_date: toDate(input.manufacture_date),
-  });
+
+  const updateData: {
+    purchase_price?: number;
+    selling_price?: number;
+    tax_rate?: number;
+    batch_quantity?: number;
+    expiry_date?: Date | null;
+    manufacture_date?: Date | null;
+  } = {};
+
+  if (input.purchase_price !== undefined) {
+    updateData.purchase_price = input.purchase_price;
+  }
+
+  if (input.selling_price !== undefined) {
+    updateData.selling_price = input.selling_price;
+  }
+
+  if (input.tax_rate !== undefined) {
+    updateData.tax_rate = input.tax_rate;
+  }
+
+  if (input.batch_quantity !== undefined) {
+    updateData.batch_quantity = input.batch_quantity;
+  }
+
+  if (input.expiry_date !== undefined) {
+    updateData.expiry_date = toDate(input.expiry_date);
+  }
+
+  if (input.manufacture_date !== undefined) {
+    updateData.manufacture_date = toDate(input.manufacture_date);
+  }
+
+  const batch = await storeProductBatchModel.update(
+    getParamId(req),
+    updateData,
+  );
+
   return sendSuccess(res, 200, batch);
 });
 
