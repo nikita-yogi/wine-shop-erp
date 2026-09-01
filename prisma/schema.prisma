@@ -54,6 +54,8 @@ model users {
   permissions   user_permissions[]
   role          roles?             @relation(fields: [role_id], references: [id], map: "users_roleId_fkey")
 
+  password_otps password_otp[]
+
   @@index([role_id], map: "users_roleId_idx")
   @@map("users")
 }
@@ -104,6 +106,25 @@ model session {
   @@index([user_id], map: "idx_sessions_user")
   @@index([is_active], map: "idx_sessions_active")
   @@map("session")
+}
+
+model password_otp {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  email         String    @db.VarChar(255)
+  otp           String    @db.VarChar(6)
+  is_used       Boolean   @default(false)
+  expires_at    DateTime
+  created_at    DateTime  @default(now())
+  deleted_at    DateTime?
+  attempts      Int       @default(0)
+  blocked_until DateTime?
+
+  // Relation with existing users table (Assuming model name is 'users')
+  user users @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([email])
 }
 
 model stores {

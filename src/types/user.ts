@@ -17,8 +17,7 @@ export interface LoginContext {
 }
 
 export interface profileDTO {
-
-    phone?: string;
+  phone?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -33,11 +32,41 @@ export interface CreateUserData {
   role_id: number;
 }
 
-
 export interface CreateSessionData {
   user_id: number;
   session_token: string;
   ip_address: string;
   user_agent: string;
   expires_at: Date;
+}
+
+export interface CreateOtpData {
+  user_id: number;
+  email: string;
+  otp: string;
+  expires_at: Date;
+}
+
+export interface updateOtpData {
+  id: number;
+  attempts: number;
+ blocked_until: Date | null;
+}
+
+// export interface burnOtpData {
+//   id: number;
+//   attempts: number;
+//   blockedUntil: Date;
+// }
+
+export interface ResetPasswordData {
+  email: string;
+  passwordHash: string;
+  otpId: number;
+}
+
+
+export interface ResetAfterLoginData {
+  email: string;
+  passwordHash: string;
 }

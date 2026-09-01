@@ -13,7 +13,6 @@ import { authMiddleware } from "../middleware/auth.js";
 
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { createUserByOwnerSchema } from "../validations/user.schema.js";
-
 const router = Router();
 
 // ==========================================================
