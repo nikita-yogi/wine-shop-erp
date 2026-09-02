@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 import { authModel } from "../models/auth.js";
 import { roleModel } from "../models/role.js";
 import { assignDefaultPermissions } from "../utils/assignDefaultPermissions.js";
-import type { CreateUserByOwnerDTO } from "../validations/user.schema.js";
+import type { CreateUserByOwnerDTO} from "../validations/user.schema.js";
+import { success } from "zod";
 
 export async function createUserByOwner(req: Request, res: Response) {
   try {
@@ -100,11 +101,11 @@ export async function deleteProfile(req: Request, res: Response) {
     }
     const existingUser = await userModel.findUserById(userUuid);
     if(!existingUser){
-       return res.status(400).json({ error: "User is not found" });
+       return res.status(400).json({success:false, error: "User is not found" });
     }
      await userModel.delteUsereProfile(userUuid);
     
-    res.status(200).json({ message:"User deleted successfull" });
+    res.status(200).json({success:true, message:"User deleted successfull" });
   } catch (error: any) {
     res.status(500).json({  error: error.message, });
   }

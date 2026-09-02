@@ -1,6 +1,5 @@
 import { Router } from "express";
 import storeController from "../controllers/store.js";
-import { authMiddleware } from "../middleware/auth.js";
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -11,7 +10,7 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware);
+
 
 router.post(
   "/",

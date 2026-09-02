@@ -9,27 +9,26 @@ import {
   getAll
   
 } from "../controllers/user.js";
-import { authMiddleware } from "../middleware/auth.js";
+
 
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { createUserByOwnerSchema } from "../validations/user.schema.js";
 const router = Router();
 
 // ==========================================================
-// 🏢 1. OWNER LEVEL ROUTES (Sirf Owner Chala Sakta Hai)
+//  1. OWNER LEVEL ROUTES (Sirf Owner Chala Sakta Hai)
 // PATH: GET http://localhost:5000/api/users/
 // ==========================================================
 //  Naya cashier ya staff create karna
 router.post(
   "/",
-  authMiddleware,
   authorizePermission("manage_users"), // sirf woh log jinke paas yeh permission hai (owner ke paas hai)
   validate(createUserByOwnerSchema),
   createUserByOwner,
 );
 
 // Saare employees ki list dekhna (Owner ke liye)
-router.get("/", authMiddleware, 
+router.get("/",
   authorizePermission("view_users"),
    getAll);
 
@@ -37,7 +36,6 @@ router.get("/", authMiddleware,
    // Kisi cashier/staff ko delete karna
 router.delete(
   "/:userUuid",
-  authMiddleware,
   authorizePermission("manage_users"),
   deleteProfile,
 );
@@ -52,14 +50,12 @@ router.delete(
 
 router.get(
   "/profile",
-  authMiddleware,
   getProfile // Isme koi extra permission nahi chahiye, har koi dekh sakta hai
 );
 
 // kud ki info updated krna
 router.put(
   "/profile",
-  authMiddleware,
   validate(updateProfileSchema),
   updateProfile,
 );

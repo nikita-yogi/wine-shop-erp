@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import prisma from "./src/config/prisma.js";
 import { errorHandler } from "./src/middleware/errorHandler.js";
 import mainRoute from "./src/routes/routes.js";
+import { ApiError } from "./src/utils/ApiError.js"; 
 import { globalLimiter } from "./src/middleware/rateLimiter.js";
 const app = express();
 
@@ -26,12 +27,7 @@ app.get("/api/test-db", async (req, res) => {
       message: "Database connected successfully",
     });
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-    });
+    throw new ApiError(500, "Database connection failed", error);
   }
 });
 

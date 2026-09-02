@@ -211,6 +211,7 @@ export async function changePasswordAfterLogin(req: Request, res: Response) {
 // REGISTER
 //=============================================================
 export async function register(req: Request, res: Response) {
+  console.log("req body");
   try {
     const data: RegisterDTO = req.body;
 
