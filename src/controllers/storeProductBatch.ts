@@ -33,7 +33,7 @@ const create = asyncHandler(async (req: Request, res: Response) => {
     tax_rate: input.tax_rate,
   }),
 
-    batch_quantity: input.batch_quantity,
+    quantity: input.batch_quantity,
     expiry_date: toDate(input.expiry_date ?? null),
 
     manufacture_date: toDate(input.manufacture_date ?? null),
