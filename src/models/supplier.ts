@@ -6,6 +6,7 @@ import type {
 } from "../types/supplier.js";
 
 export const supplierModel = {
+  
   createSupplier: (data: CreateSupplierInput) => {
     return prisma.suppliers.create({ data: data });
   },
@@ -22,7 +23,13 @@ export const supplierModel = {
       data,
     });
   },
+ findAllSupplier:()=>{
+  return prisma.suppliers.findMany({
+    where:{deleted_at:null},
 
+  });
+
+ },
   softDelete: (uuid:  supplierUuid) => {
     return prisma.suppliers.update({
       where: { uuid: uuid },

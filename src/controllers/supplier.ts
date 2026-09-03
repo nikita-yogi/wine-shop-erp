@@ -1,10 +1,10 @@
-import { success } from "zod";
 import { supplierModel } from "../models/supplier.js";
-import type { Request, Response, NextFunction } from "express";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import type { Request, Response } from "express";
 import { ApiError } from "../utils/ApiError.js";
 import { sendSuccess } from "../utils/sendSuccess.js";
-// create supplier
+import { getUuidParam } from "../utils/getUuidParam.js";
+
+//creat
 export async function createSupplierHandler(req: Request, res: Response) {
   const supplier = await supplierModel.createSupplier(req.body);
   if (!supplier) {
@@ -15,12 +15,9 @@ export async function createSupplierHandler(req: Request, res: Response) {
   });
 }
 
-// 2. Get Supplier By Uuid
+//  Get Supplier By Uuid
 export async function getSupplierByUuid(req: Request, res: Response) {
-  const uuid = req.params.uuid as string;
-  if (!uuid) {
-    throw new ApiError(400, "supplier uuid is required");
-  }
+  const uuid = getUuidParam(req);
 
   const supplier = await supplierModel.findByUuid(uuid);
   if (!supplier) {
@@ -34,16 +31,15 @@ export async function getSupplierByUuid(req: Request, res: Response) {
 
 // updated
 export async function updatedSupplier(req: Request, res: Response) {
-  const uuid = req.params.uuid as string;
-  if (!uuid) {
-    throw new ApiError(400, "supplier uuid is required");
-  }
+  const uuid = getUuidParam(req);
 
   const supplier = await supplierModel.findByUuid(uuid);
   if (!supplier) {
     throw new ApiError(404, "Supplier not found");
   }
+
   const updated = await supplierModel.updatedByUuid(uuid, req.body);
+
   return sendSuccess(res, 200, updated, {
     message: "Supplier updated successfully",
   });
@@ -51,10 +47,7 @@ export async function updatedSupplier(req: Request, res: Response) {
 
 //  Delete Supplier
 export async function deleteSupplier(req: Request, res: Response) {
-  const uuid = req.params.uuid as string;
-  if (!uuid) {
-    throw new ApiError(400, "supplier uuid is required");
-  }
+  const uuid = getUuidParam(req);
 
   const existing = await supplierModel.findByUuid(uuid);
   if (!existing) {
