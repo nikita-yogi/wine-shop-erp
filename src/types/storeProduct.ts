@@ -1,12 +1,13 @@
 export interface CreateStoreProductDTO {
   store_uuid: string ;
   product_uuid: string;
-  stock?: number;
 }
 
 export interface UpdateStoreProductDTO {
-  stock: number;
+  store_uuid?: string;
+  product_uuid?: string;
 }
+
 
 export interface StoreProductFilters {
   store_uuid?: string;

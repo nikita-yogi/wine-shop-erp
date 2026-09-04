@@ -1,214 +1,156 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
+
 import storeProductModel from "../models/storeProduct.js";
 import storeModel from "../models/store.js";
 import productModel from "../models/product.js";
+
 import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendSuccess } from "../utils/sendSuccess.js";
+import { getParamId } from "../utils/getParamId.js";
 
 import type {
   CreateStoreProductDTO,
   UpdateStoreProductDTO,
 } from "../types/storeProduct.js";
 
-const getQueryString = (req: Request, key: string): string | undefined => {
-  const raw = req.query[key];
+const create = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as CreateStoreProductDTO;
 
-  if (raw === undefined) {
-    return undefined;
+  const [store, product] = await Promise.all([
+    storeModel.findByUuid(input.store_uuid),
+    productModel.findByUuid(input.product_uuid),
+  ]);
+
+  if (!store) {
+    throw new ApiError(404, "Store not found");
   }
 
-  if (typeof raw !== "string") {
-    throw new ApiError(400, `${key} must be a single string`);
+  if (!product) {
+    throw new ApiError(404, "Product not found");
   }
 
-  return raw;
-};
+  const storeProduct = await storeProductModel.create(
+    store.id,
+    product.id,
+  );
 
-const getRequiredQueryString = (req: Request, key: string): string => {
-  const value = getQueryString(req, key);
+  return sendSuccess(res, 201, storeProduct);
+});
 
-  if (!value) {
-    throw new ApiError(400, `${key} is required`);
-  }
+const list = asyncHandler(async (req: Request, res: Response) => {
+  const store_uuid =
+    typeof req.query.store_uuid === "string"
+      ? req.query.store_uuid
+      : undefined;
 
-  return value;
-};
+  const product_uuid =
+    typeof req.query.product_uuid === "string"
+      ? req.query.product_uuid
+      : undefined;
 
-const getPositiveIntegerQuery = (
-  req: Request,
-  key: "page" | "limit",
-  def: number,
-): number => {
-  const value = req.query[key];
+  const page =
+    typeof req.query.page === "string"
+      ? Math.max(Number(req.query.page), 1)
+      : 1;
 
-  if (value === undefined) {
-    return def;
-  }
+  const limit =
+    typeof req.query.limit === "string"
+      ? Math.min(Math.max(Number(req.query.limit), 1), 100)
+      : 20;
 
-  if (typeof value !== "string" || !/^\d+$/.test(value) || Number(value) < 1) {
-    throw new ApiError(400, `${key} must be a positive integer`);
-  }
+  const skip = (page - 1) * limit;
 
-  return Number(value);
-};
-
-const handlePrismaError = (error: unknown, next: NextFunction) => {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  ) {
-    return next(
-      new ApiError(409, "This product is already assigned to this store"),
-    );
-  }
-
-  return next(error);
-};
-
-const create = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const input = req.body as CreateStoreProductDTO;
-
-    const [store, product] = await Promise.all([
-      storeModel.findByUuid(input.store_uuid),
-      productModel.findByUuid(input.product_uuid),
-    ]);
-
-    if (!store) {
-      throw new ApiError(404, "Store not found");
-    }
-
-    if (!product) {
-      throw new ApiError(404, "Product not found");
-    }
-
-    const storeProduct = await storeProductModel.create(
-      store.id,
-      product.id,
-      input.stock ?? 0,
-    );
-
-    return res.status(201).json({
-      success: true,
-      data: storeProduct,
-    });
-  } catch (error) {
-    handlePrismaError(error, next);
-  }
-};
-
-const list = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const store_uuid = getQueryString(req, "store_uuid");
-
-    const product_uuid = getQueryString(req, "product_uuid");
-
-    const where = {
-      deleted_at: null,
-
-      ...(store_uuid && {
-        store: {
-          uuid: store_uuid,
-        },
-      }),
-
-      ...(product_uuid && {
-        product: {
-          uuid: product_uuid,
-        },
-      }),
-    };
-
-    const page = getPositiveIntegerQuery(req, "page", 1);
-
-    const limit = Math.min(100, getPositiveIntegerQuery(req, "limit", 20));
-
-    const skip = (page - 1) * limit;
-
-    const [data, total] = await Promise.all([
-      storeProductModel.findAll(where, skip, limit),
-      storeProductModel.count(where),
-    ]);
-
-    return res.status(200).json({
-      success: true,
-      data,
-
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+  const where = {
+    deleted_at: null as null,
+    ...(store_uuid && {
+      store: {
+        uuid: store_uuid,
       },
-    });
-  } catch (error) {
-    next(error);
+    }),
+    ...(product_uuid && {
+      product: {
+        uuid: product_uuid,
+      },
+    }),
+  };
+
+  const [data, total] = await Promise.all([
+    storeProductModel.findAll(where, skip, limit),
+    storeProductModel.count(where),
+  ]);
+
+  return sendSuccess(res, 200, data, {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  });
+});
+
+const getOne = asyncHandler(async (req: Request, res: Response) => {
+  const uuid = getParamId(req);
+
+  const storeProduct = await storeProductModel.findByUuid(uuid);
+
+  if (!storeProduct) {
+    throw new ApiError(404, "Store product not found");
   }
-};
 
-const getOne = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const uuid = getRequiredQueryString(req, "uuid");
+  return sendSuccess(res, 200, storeProduct);
+});
 
-    const storeProduct = await storeProductModel.findByUuid(uuid);
+const update = asyncHandler(async (req: Request, res: Response) => {
+  const uuid = getParamId(req);
 
-    if (!storeProduct) {
-      throw new ApiError(404, "Store product not found");
-    }
+  const input = req.body as UpdateStoreProductDTO;
 
-    return res.status(200).json({
-      success: true,
-      data: storeProduct,
-    });
-  } catch (error) {
-    next(error);
+  const existing = await storeProductModel.findByUuid(uuid);
+
+  if (!existing) {
+    throw new ApiError(404, "Store product not found");
   }
-};
 
-const update = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const uuid = getRequiredQueryString(req, "uuid");
+  const storeId = input.store_uuid
+    ? (await storeModel.findByUuid(input.store_uuid))?.id
+    : existing.store_id;
 
-    const { stock } = req.body as UpdateStoreProductDTO;
+  const productId = input.product_uuid
+    ? (await productModel.findByUuid(input.product_uuid))?.id
+    : existing.product_id;
 
-    const existing = await storeProductModel.findByUuid(uuid);
-
-    if (!existing) {
-      throw new ApiError(404, "Store product not found");
-    }
-
-    const storeProduct = await storeProductModel.update(uuid, stock);
-
-    return res.status(200).json({
-      success: true,
-      data: storeProduct,
-    });
-  } catch (error) {
-    handlePrismaError(error, next);
+  if (storeId === undefined) {
+    throw new ApiError(404, "Store not found");
   }
-};
 
-const remove = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const uuid = getRequiredQueryString(req, "uuid");
-
-    const existing = await storeProductModel.findByUuid(uuid);
-
-    if (!existing) {
-      throw new ApiError(404, "Store product not found");
-    }
-
-    await storeProductModel.softDelete(uuid);
-
-    return res.status(200).json({
-      success: true,
-      message: "Store product removed",
-    });
-  } catch (error) {
-    next(error);
+  if (productId === undefined) {
+    throw new ApiError(404, "Product not found");
   }
-};
+
+  const storeProduct = await storeProductModel.update(
+    uuid,
+    storeId,
+    productId,
+  );
+
+  return sendSuccess(res, 200, storeProduct);
+});
+
+const remove = asyncHandler(async (req: Request, res: Response) => {
+  const uuid = getParamId(req);
+
+  const existing = await storeProductModel.findByUuid(uuid);
+
+  if (!existing) {
+    throw new ApiError(404, "Store product not found");
+  }
+
+  await storeProductModel.softDelete(uuid);
+
+  return sendSuccess(res, 200, null, {
+    message: "Store product removed successfully",
+  });
+});
 
 export default {
   create,
