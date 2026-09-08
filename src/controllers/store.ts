@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import storeModel from "../models/store.js";
 import { ApiError } from "../utils/ApiError.js";
+import { sendSuccess } from "../utils/sendSuccess.js";
+
 
 import type {
   CreateStoreDTO,
@@ -277,6 +279,12 @@ const remove = async (
       success: true,
       message: "Store deleted successfully",
     });
+
+    // return sendSuccess(res, 201, data);
+
+
+
+
   } catch (error) {
     next(error);
   }

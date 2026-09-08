@@ -372,7 +372,7 @@ model customers {
   uuid          String          @unique(map: "uuid") @default(uuid()) @db.Char(36)
 
   name          String?         @db.VarChar(150)
-  phone_no      String?         @db.VarChar(20)
+  phone_no      String?         @db.VarChar(20) @unique
   email         String?         @db.VarChar(150)
  
   dob           DateTime?       @db.Date
