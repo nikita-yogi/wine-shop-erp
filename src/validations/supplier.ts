@@ -23,5 +23,15 @@ export const supplierUuidParamSchema = z.object({
 // export type CreateSupplierInput = z.infer<typeof createSupplierSchema>;
 // export type UpdateSupplierInput = z.infer<typeof updateSupplierSchema>;
 
-
-
+export const supplierListQuerySchema = z.object({
+  // Pagination Fields
+  page: z.coerce.number().int().positive().optional().default(1),
+  limit: z.coerce.number().int().positive().max(100).optional().default(10),
+  
+  // Filter & Search Fields
+  search: z.string().trim().optional(),
+  status: z.enum(["true", "false"]).optional(), // Database boolean mapping ke liye
+  city: z.string().trim().optional(),
+  state: z.string().trim().optional(),
+  // store_uuid: z.string().uuid().optional(), // Store isolation ke liye key
+});

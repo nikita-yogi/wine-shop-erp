@@ -195,6 +195,8 @@ export async function register(req: Request, res: Response) {
   // 2. Existing user check
   const existingUser = await authModel.findUserByEmail(data.email);
 
+  console.log("EMAIL:", data.email);
+  console.log("EXISTING USER:", existingUser);
   if (existingUser) {
     throw new ApiError(409, "User already exists");
   }

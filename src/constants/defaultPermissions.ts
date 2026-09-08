@@ -7,7 +7,6 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "view_stores",
     "manage_products",
     "view_products",
-    "manage_categories",
     "manage_brands",
     "manage_suppliers",
     "view_suppliers",

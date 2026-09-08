@@ -5,11 +5,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   createSupplierSchema,
   supplierUuidParamSchema,
-  updateSupplierSchema
+  updateSupplierSchema,
+  supplierListQuerySchema
 } from "../validations/supplier.js";
 import {
   createSupplierHandler,
   getSupplierByUuid,
+  listSupplier,
   updatedSupplier,
   deleteSupplier,
 } from "../controllers/supplier.js";
@@ -27,6 +29,13 @@ router.get(
   validate(supplierUuidParamSchema,"params"),
   asyncHandler(getSupplierByUuid),
 );
+router.get(
+  "/",
+  authorizePermission("manage_suppliers"),
+  validate(supplierListQuerySchema, "query"),
+  asyncHandler(listSupplier),
+);
+
 
 router.patch(
   "/:uuid",
