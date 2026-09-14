@@ -17,18 +17,23 @@ import {
 } from "../controllers/supplier.js";
 const router = Router();
 
+
+// create
 router.post(
   "/",
   authorizePermission("manage_suppliers"),
   validate(createSupplierSchema),
   asyncHandler(createSupplierHandler),
 );
+
+//get supplier by uuid
 router.get(
   "/:uuid",
   authorizePermission("manage_suppliers"),
   validate(supplierUuidParamSchema,"params"),
   asyncHandler(getSupplierByUuid),
 );
+//get supplierList 
 router.get(
   "/",
   authorizePermission("manage_suppliers"),
@@ -36,7 +41,7 @@ router.get(
   asyncHandler(listSupplier),
 );
 
-
+//upated supplier
 router.patch(
   "/:uuid",
   authorizePermission("manage_suppliers"),
@@ -45,7 +50,7 @@ router.patch(
   asyncHandler(updatedSupplier),
 );
 
-
+//delte//supplier
 router.delete(
   "/:uuid",
   authorizePermission("manage_suppliers"),

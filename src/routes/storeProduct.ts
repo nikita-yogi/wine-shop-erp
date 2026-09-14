@@ -11,7 +11,7 @@ import {
 const router = Router();
 
 
-
+//create
 router.post(
   "/",
   authorizePermission("manage_inventory"),

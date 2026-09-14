@@ -5,8 +5,8 @@ export const userModel = {
     return prisma.users.findUnique({ where: { uuid: userUuid } });
   },
 
-  updateUserProfile: (userUuid: string, data: any) => {
-    return prisma.users.update({
+  updateUserProfile: async(userUuid: string, data: any) => {
+    const user = await prisma.users.update({
       where: { uuid: userUuid },
       data: {
         ...data,
@@ -15,6 +15,9 @@ export const userModel = {
           : undefined,
       },
     });
+    const { password, ...safeUser } = user;
+
+    return safeUser;
   },
 
   createUserWithRole: (data: {
@@ -25,14 +28,41 @@ export const userModel = {
   }) => {
     return prisma.users.create({ data });
   },
-  findAllUsers: () => {
-    return prisma.users.findMany({
-        where: {
-        deleted_at: null, 
-      },
-      include: { role: true },
-    });
-  },
+
+  // findAllUsers: async() => {
+  // const user =await prisma.users.findMany({
+  //     where: {
+  //       deleted_at: null,
+  //     },
+  //     include: { role: true },
+  //   });
+  //   const { password ,...safeUser}= user;
+  //   return safeUser;
+  // },
+
+  findAllUsers: async () => {
+  return prisma.users.findMany({
+    where: {
+      deleted_at: null,
+    },
+    select: {
+      id: true,
+      uuid: true,
+      name: true,
+      email: true,
+      phone: true,
+      address: true,
+      city: true,
+      state: true,
+      date_of_birth: true,
+      role_id: true,
+      status: true,
+      created_at: true,
+      updated_at: true,
+      role: true,
+    },
+  });
+},
   getUserProfile: (userUuid: string) => {
     return prisma.users.findUnique({
       where: { uuid: userUuid },

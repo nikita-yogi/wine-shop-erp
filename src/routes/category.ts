@@ -13,7 +13,7 @@ import {
 const router = Router();
 
 
-
+//Create Category
 router.post(
   "/",
   authorizePermission("manage_categories"),
