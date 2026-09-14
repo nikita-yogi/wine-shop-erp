@@ -12,7 +12,10 @@ const buildWhere = (filters: StoreFilters): Prisma.storesWhereInput => ({
   ...(filters.city !== undefined && { city: filters.city }),
 });
 
-const create = (data: CreateStoreDTO) => {
+const create = (
+  data: CreateStoreDTO,
+  tx: Prisma.TransactionClient = prisma,
+) => {
   const storeData = {
     ...data,
     expiry_date: data.expiry_date
@@ -20,7 +23,7 @@ const create = (data: CreateStoreDTO) => {
       : null,
   };
 
-  return prisma.stores.create({ data: storeData });
+  return tx.stores.create({ data: storeData });
 };
 
 const findAll = (filters: StoreFilters, skip: number, take: number) => {

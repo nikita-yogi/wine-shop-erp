@@ -9,6 +9,9 @@ import productTypeRoutes from "./productType.js";
 import storeProductRoutes from "./storeProduct.js";
 import storeProductBatchRoutes from "./storeProductBatch.js";
 import customerRoutes from "./customers.js"
+import orderRoutes from "./order.js";
+import productRoutes from "./product.js"
+
 
 
 const router = Router();
@@ -28,6 +31,8 @@ router.use("/product-types", productTypeRoutes);
 router.use("/store-products", storeProductRoutes);
 router.use("/storeProduct-batch", storeProductBatchRoutes);
 router.use("/customer", customerRoutes );
+router.use("/orders", orderRoutes);
+router.use("/products", productRoutes);
 
 
 

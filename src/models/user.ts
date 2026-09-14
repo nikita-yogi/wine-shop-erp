@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import type { Prisma } from "@prisma/client";
 
 export const userModel = {
   findUserById: (userUuid: string) => {
@@ -17,14 +18,30 @@ export const userModel = {
     });
   },
 
-  createUserWithRole: (data: {
+
+
+  // createUserWithRole: (data: {
+  //   name: string;
+  //   email: string;
+  //   password: string;
+  //   role_id: number;
+  // }) => {
+  //   return prisma.users.create({ data });
+  // },
+  
+  createUserWithRole: (
+  data: {
     name: string;
     email: string;
     password: string;
     role_id: number;
-  }) => {
-    return prisma.users.create({ data });
   },
+  tx: Prisma.TransactionClient = prisma
+) => {
+  return tx.users.create({ data });
+},
+  
+  
   findAllUsers: () => {
     return prisma.users.findMany({
         where: {
@@ -33,6 +50,7 @@ export const userModel = {
       include: { role: true },
     });
   },
+
   getUserProfile: (userUuid: string) => {
     return prisma.users.findUnique({
       where: { uuid: userUuid },

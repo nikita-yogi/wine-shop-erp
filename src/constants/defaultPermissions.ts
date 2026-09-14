@@ -21,12 +21,13 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "view_payments",
     "sell_product",
     "view_reports",
-    "manage_categories",
     "view_categories",
     "manage_product_types",
     "view_product_types",
     "view_customer",
     "manage_customer",
+    "manage_order",
+    "view_order"
   ],
 
   manager: [
@@ -42,6 +43,7 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "view_reports",
     "view_customer",
     "manage_customer",
+     "view_order"
   ],
 
   shopkeeper: [
@@ -59,5 +61,7 @@ export const DEFAULT_PERMISSIONS: Record<string, string[]> = {
     "view_payments",
     "view_customer",
     "manage_customer",
+    "manage_order",
+    "view_order"
   ],
 };

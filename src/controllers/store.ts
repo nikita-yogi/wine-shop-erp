@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import storeModel from "../models/store.js";
+import prisma from "../config/prisma.js";
+
 import { ApiError } from "../utils/ApiError.js";
 import { sendSuccess } from "../utils/sendSuccess.js";
 
@@ -116,15 +118,52 @@ const create = async (
       throw new ApiError(400, "Invalid status value");
     }
 
-    const store = await storeModel.create({
+    const result = await prisma.$transaction(async (tx) => {
+  const ownerRole = await tx.roles.findUnique({
+    where: {
+      name: "owner",
+    },
+  });
+
+  if (!ownerRole) {
+    throw new ApiError(500, "OWNER role not found");
+  }
+
+//   const existingStore = await tx.user_branches.findFirst({
+//   where: {
+//     user_id: req.user!.userId,
+//     role_id: ownerRole.id,
+//     deleted_at: null,
+//   },
+// });
+
+// if (existingStore) {
+//   throw new ApiError(409, "Owner can have only one store");
+// }
+
+  const store = await storeModel.create(
+    {
       ...input,
       status: input.status ?? "open",
-    });
+    },
+    tx
+  );
 
-    return res.status(201).json({
-      success: true,
-      data: store,
-    });
+  await tx.store_admin.create({
+  data: {
+    user_id: req.user!.userId,
+    store_id: store.id,
+    role_id: ownerRole.id,
+  },
+});
+
+  return store;
+});
+
+return res.status(201).json({
+  success: true,
+  data: result,
+});
   } catch (error) {
     try {
       handleUniqueError(error);
