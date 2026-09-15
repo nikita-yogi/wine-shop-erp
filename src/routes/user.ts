@@ -21,7 +21,7 @@ const router = Router();
 //  1. OWNER LEVEL ROUTES (Sirf Owner Chala Sakta Hai)
 // PATH: GET http://localhost:5000/api/users/
 // ==========================================================
-//  Naya cashier ya staff create karna
+//  New cashier or staff create 
 router.post(
   "/",
   authorizePermission("manage_users"), // sirf woh log jinke paas yeh permission hai (owner ke paas hai)
@@ -29,7 +29,7 @@ router.post(
    asyncHandler(createUserByOwner),
 );
 
-// Saare employees ki list dekhna (Owner ke liye)
+// getAll employees list(Owner ke liye)
 router.get("/",
   authorizePermission("view_users"),
     asyncHandler(getAll)
@@ -50,13 +50,12 @@ router.delete(
 // ===========================================
 
 //  jis role se login hai, woh apni khud ki profile dekh sake 
-
 router.get(
   "/profile",
-   asyncHandler(getProfile )// Isme koi extra permission nahi chahiye, har koi dekh sakta hai
+   asyncHandler(getProfile )
 );
 
-// kud ki info updated krna
+// updated own info
 router.put(
   "/profile",
   validate(updateProfileSchema),

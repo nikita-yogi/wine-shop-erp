@@ -33,3 +33,7 @@ export const updateStoreProductBatchSchema = z.object({
 export const storeProductBatchParamsSchema = z.object({
   uuid: z.string().uuid(),
 });
+
+
+
+

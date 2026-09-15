@@ -315,6 +315,7 @@ CREATE TABLE `customer_meta` (
 
     UNIQUE INDEX `uuid`(`uuid`),
     INDEX `fk_customer_meta_customer`(`customer_id`),
+    UNIQUE INDEX `customer_meta_customer_id_meta_key_key`(`customer_id`, `meta_key`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -322,9 +323,9 @@ CREATE TABLE `customer_meta` (
 CREATE TABLE `customers` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
+    `name` VARCHAR(150) NULL,
     `phone_no` VARCHAR(20) NULL,
     `email` VARCHAR(150) NULL,
-    `password` VARCHAR(255) NULL,
     `dob` DATE NULL,
     `address` VARCHAR(255) NULL,
     `city` VARCHAR(100) NULL,
@@ -404,7 +405,7 @@ CREATE TABLE `purchase_order_items` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
     `purchase_order_id` INTEGER NOT NULL,
-    `batch_id` INTEGER NOT NULL,
+    `batch_id` INTEGER NULL,
     `product_id` INTEGER NOT NULL,
     `quantity` DECIMAL(12, 2) NOT NULL,
     `unit_per_pack` DECIMAL(12, 2) NULL,
@@ -562,7 +563,7 @@ ALTER TABLE `orders` ADD CONSTRAINT `fk_orders_customer` FOREIGN KEY (`customer_
 ALTER TABLE `orders` ADD CONSTRAINT `fk_orders_store` FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `purchase_order_items` ADD CONSTRAINT `fk_purchase_order_items_batch` FOREIGN KEY (`batch_id`) REFERENCES `store_product_batches`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `purchase_order_items` ADD CONSTRAINT `fk_purchase_order_items_batch` FOREIGN KEY (`batch_id`) REFERENCES `store_product_batches`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `purchase_order_items` ADD CONSTRAINT `fk_purchase_order_items_order` FOREIGN KEY (`purchase_order_id`) REFERENCES `purchase_orders`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

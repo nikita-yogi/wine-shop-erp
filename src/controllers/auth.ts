@@ -145,10 +145,16 @@ export async function changePassword(req: Request, res: Response) {
 // =========================================================================
 export async function changePasswordAfterLogin(req: Request, res: Response) {
   const { currentPassword, newPassword, confirmPassword } = req.body;
+
   const email = (req as any).user?.email;
+  
+  // console.log("REQ USER:", req.user);
+  // console.log("EMAIL:", (req as any).user?.email);
+
   if (!email || !currentPassword || !newPassword || !confirmPassword) {
     throw new ApiError(400, "All fields are required");
   }
+  
   const user = await authModel.findUserByEmail(email);
   if (!user) {
     throw new ApiError(400, "User not found");
@@ -195,6 +201,8 @@ export async function register(req: Request, res: Response) {
   // 2. Existing user check
   const existingUser = await authModel.findUserByEmail(data.email);
 
+  console.log("EMAIL:", data.email);
+  console.log("EXISTING USER:", existingUser);
   if (existingUser) {
     throw new ApiError(409, "User already exists");
   }
@@ -249,6 +257,7 @@ export async function login(req: Request, res: Response) {
     userId: user.id,
     userUuid: user.uuid,
     roleId: user.role_id,
+     email: user.email,
   };
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken(payload);
@@ -301,6 +310,7 @@ export async function refreshAccessToken(req: Request, res: Response) {
     userId: decoded.userId,
     userUuid: decoded.userUuid,
     roleId: decoded.roleId,
+      email: decoded.email!,
   };
   const newAccessToken = generateAccessToken(payload);
 

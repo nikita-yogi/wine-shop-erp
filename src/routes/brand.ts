@@ -14,7 +14,7 @@ import {
 const router = Router();
 
 
-
+//brand create
 router.post(
   "/",
   authorizePermission("manage_brands"),
@@ -22,8 +22,10 @@ router.post(
   brandController.create,
 );
 
+//  get list of brand brand 
 router.get("/", authorizePermission("manage_brands"), brandController.list);
 
+//brand 
 router.get(
   "/:uuid",
   authorizePermission("manage_brands"),
@@ -31,6 +33,7 @@ router.get(
   brandController.getBrand,
 );
 
+//brand 
 router.patch(
   "/:uuid",
   authorizePermission("manage_brands"),
@@ -39,6 +42,7 @@ router.patch(
   brandController.update,
 );
 
+//brand 
 router.delete(
   "/:uuid",
   authorizePermission("manage_brands"),
