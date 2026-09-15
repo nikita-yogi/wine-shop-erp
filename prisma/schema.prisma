@@ -8,13 +8,15 @@ datasource db {
 }
 
 model roles {
-  id         Int       @id @default(autoincrement())
-  uuid       String    @unique @default(uuid()) @db.Char(36)
-  name       String    @unique @db.VarChar(50)
-  status     Status    @default(active)
-  created_at DateTime  @default(now())
-  deleted_at DateTime?
-  users      users[]
+  id            Int             @id @default(autoincrement())
+  uuid          String          @unique @default(uuid()) @db.Char(36)
+  name          String          @unique @db.VarChar(50)
+  status        Status          @default(active)
+  created_at    DateTime        @default(now())
+  deleted_at    DateTime?
+  users         users[]
+  store_admin store_admin[] 
+  store_users  store_users[]
 
   @@map("roles")
 }
@@ -53,6 +55,8 @@ model users {
   meta          user_meta[]
   permissions   user_permissions[]
   role          roles?             @relation(fields: [role_id], references: [id], map: "users_roleId_fkey")
+  store_admin store_admin[]
+  store_users  store_users[]
 
   password_otps password_otp[]
 
@@ -150,10 +154,36 @@ model stores {
   audit_logs      audit_logs[]
   orders          orders[]
   purchase_orders purchase_orders[]
+  store_admin   store_admin[]
+  store_users  store_users[]
 
   @@index([status], map: "idx_stores_status")
   @@index([city], map: "idx_stores_city")
   @@map("stores")
+}
+
+model store_admin {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid()) @db.Char(36)
+
+  user_id    Int
+  store_id   Int
+  role_id    Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  user  users  @relation(fields: [user_id], references: [id], onDelete: Restrict)
+  store stores @relation(fields: [store_id], references: [id], onDelete: Restrict)
+  role  roles  @relation(fields: [role_id], references: [id], onDelete: Restrict)
+
+  @@unique([user_id, store_id])
+  @@index([user_id])
+  @@index([store_id])
+  @@index([role_id])
+
+  @@map("store_admin")
 }
 
 model brands {
@@ -330,6 +360,30 @@ model store_product_batches {
   @@map("store_product_batches")
 }
 
+model store_users {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid()) @db.Char(36)
+
+  user_id    Int
+  store_id   Int
+  role_id    Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  user  users  @relation(fields: [user_id], references: [id], onDelete: Restrict)
+  store stores @relation(fields: [store_id], references: [id], onDelete: Restrict)
+  role  roles  @relation(fields: [role_id], references: [id], onDelete: Restrict)
+
+  @@unique([user_id, store_id])
+  @@index([user_id])
+  @@index([store_id])
+  @@index([role_id])
+
+  @@map("store_users")
+}
+
 model audit_logs {
   id          Int       @id @default(autoincrement())
   uuid        String    @unique(map: "uuid") @default(uuid()) @db.Char(36)
@@ -350,39 +404,39 @@ model audit_logs {
 }
 
 model customer_meta {
-  id          Int       @id @default(autoincrement())
-  uuid        String    @unique(map: "uuid") @default(uuid()) @db.Char(36)
+  id   Int    @id @default(autoincrement())
+  uuid String @unique(map: "uuid") @default(uuid()) @db.Char(36)
 
   customer_id Int
 
-  meta_key    String    @db.VarChar(100)
-  meta_value  String?   @db.Text
+  meta_key   String  @db.VarChar(100)
+  meta_value String? @db.Text
 
-  created_at  DateTime  @default(now()) @db.DateTime(0)
-  deleted_at  DateTime? @db.DateTime(0)
-  
-  customers   customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "fk_customer_meta_customer")
+  created_at DateTime  @default(now()) @db.DateTime(0)
+  deleted_at DateTime? @db.DateTime(0)
 
-  @@index([customer_id], map: "fk_customer_meta_customer")
+  customers customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "fk_customer_meta_customer")
+
   @@unique([customer_id, meta_key])
+  @@index([customer_id], map: "fk_customer_meta_customer")
 }
 
 model customers {
-  id            Int             @id @default(autoincrement())
-  uuid          String          @unique(map: "uuid") @default(uuid()) @db.Char(36)
+  id   Int    @id @default(autoincrement())
+  uuid String @unique(map: "uuid") @default(uuid()) @db.Char(36)
 
-  name          String?         @db.VarChar(150)
-  phone_no      String?         @db.VarChar(20)
-  email         String?         @db.VarChar(150)
- 
-  dob           DateTime?       @db.Date
-  address       String?         @db.VarChar(255)
-  city          String?         @db.VarChar(100)
-  state         String?         @db.VarChar(100)
-  status        Boolean         @default(true)
+  name     String? @db.VarChar(150)
+  phone_no String? @unique @db.VarChar(20)
+  email    String? @db.VarChar(150)
 
-  created_at    DateTime        @default(now()) @db.DateTime(0)
-  deleted_at    DateTime?       @db.DateTime(0)
+  dob     DateTime? @db.Date
+  address String?   @db.VarChar(255)
+  city    String?   @db.VarChar(100)
+  state   String?   @db.VarChar(100)
+  status  Boolean   @default(true)
+
+  created_at DateTime  @default(now()) @db.DateTime(0)
+  deleted_at DateTime? @db.DateTime(0)
 
   customer_meta customer_meta[]
   orders        orders[]

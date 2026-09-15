@@ -16,20 +16,16 @@ router.post(
   "/",
   authorizePermission("manage_stores"),
   validate(createStoreSchema),
-  storeController.create
+  storeController.create,
 );
 
-router.get(
-  "/",
-  authorizePermission("view_stores"),
-  storeController.list
-);
+router.get("/", authorizePermission("view_stores"), storeController.list);
 
 router.get(
   "/:uuid",
   authorizePermission("view_stores"),
   validate(storeParamsSchema, "params"),
-  storeController.getStore
+  storeController.getStore,
 );
 
 router.patch(
@@ -37,14 +33,14 @@ router.patch(
   authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
   validate(updateStoreSchema),
-  storeController.update
+  storeController.update,
 );
 
 router.delete(
   "/:uuid",
   authorizePermission("manage_stores"),
   validate(storeParamsSchema, "params"),
-  storeController.remove
+  storeController.remove,
 );
 
 export default router;

@@ -8,12 +8,16 @@ import brandRoutes from "./brand.js";
 import categoryRoutes from "./category.js";
 import productTypeRoutes from "./productType.js";
 import storeProductRoutes from "./storeProduct.js";
-import supplierRouts from "../routes/supplier.js"
-import purchaseOrderRouts from "../routes/purchaseOrder.js"
-import productRoutes from "../routes/product.js";
-import storeBatchRoutes from "../routes/storeProductBatch.js"
+import storeProductBatchRoutes from "./storeProductBatch.js";
+import customerRoutes from "./customers.js"
+import orderRoutes from "./order.js";
+import productRoutes from "./product.js"
+
+
 
 const router = Router();
+
+
 
 //auth routes
 router.use("/auth", authRoutes);
@@ -23,6 +27,15 @@ router.use("/users",authMiddleware, userRoutes);
 
 //role
 router.use("/roles", roleRoutes);
+router.use("/stores", storeRoutes);
+router.use("/brands", brandRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/product-types", productTypeRoutes);
+router.use("/store-products", storeProductRoutes);
+router.use("/storeProduct-batch", storeProductBatchRoutes);
+router.use("/customer", customerRoutes );
+router.use("/orders", orderRoutes);
+router.use("/products", productRoutes);
 
 //stores routes
 router.use("/stores", authMiddleware ,storeRoutes);
