@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import productTypeController from "../controllers/productType.js";
 
-import { authMiddleware } from "../middleware/auth.js";
+
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 
@@ -14,7 +14,6 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware);
 
 // CREATE
 router.post(

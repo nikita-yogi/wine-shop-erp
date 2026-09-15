@@ -8,6 +8,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/sendSuccess.js";
 import { getParamId } from "../utils/getParamId.js";
+import {getUuidParam } from "../utils/getUuidParam.js"
 
 import type {
   CreateStoreProductDTO,
@@ -137,7 +138,8 @@ const update = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const remove = asyncHandler(async (req: Request, res: Response) => {
-  const uuid = getParamId(req);
+  // const uuid = getParamId(req);
+  const uuid =getUuidParam (req);
 
   const existing = await storeProductModel.findByUuid(uuid);
 

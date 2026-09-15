@@ -6,8 +6,8 @@ export const userModel = {
     return prisma.users.findUnique({ where: { uuid: userUuid } });
   },
 
-  updateUserProfile: (userUuid: string, data: any) => {
-    return prisma.users.update({
+  updateUserProfile: async(userUuid: string, data: any) => {
+    const user = await prisma.users.update({
       where: { uuid: userUuid },
       data: {
         ...data,
@@ -16,6 +16,9 @@ export const userModel = {
           : undefined,
       },
     });
+    const { password, ...safeUser } = user;
+
+    return safeUser;
   },
 
 

@@ -1,10 +1,14 @@
 import type { Request, Response } from "express";
-import prisma from "../config/prisma.js";
+
 import type { profileDTO } from "../types/user.js"; // user.controller.ts
+import type { CreateUserByOwnerDTO } from "../validations/user.schema.js";
+
 import { userModel } from "../models/user.js";
-import bcrypt from "bcrypt";
 import { authModel } from "../models/auth.js";
 import { roleModel } from "../models/role.js";
+
+import bcrypt from "bcrypt";
+
 import { assignDefaultPermissions } from "../utils/assignDefaultPermissions.js";
 import type { CreateUserByOwnerDTO } from "../validations/user.schema.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -186,7 +190,37 @@ export async function createUserByOwner(req: Request, res: Response) {
       error: "Something went wrong",
     });
   }
+
+  // 3. Password hash
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  // 4. User create karo
+  const user = await userModel.createUserWithRole({
+    name: data.name,
+    email: data.email,
+    password: hashedPassword,
+    role_id: role.id,
+  });
+
+  // 5. Uski role ke hisab se default permissions do
+  const permision = await assignDefaultPermissions(user.id, role.name);
+
+  return sendSuccess(res, 201, {
+  uuid: user.uuid,
+  name: user.name,
+  email: user.email,
+  role: role.name,
+  permissions: permision,
+}, {
+  message: "User created successfully",
+});
+
 }
+
+// ==========================================================
+// UPDATE OWN PROFILE
+// PUT /api/users/profile
+// ==========================================================
 
 export async function updateProfile(req: Request, res: Response) {
   try {
@@ -207,7 +241,20 @@ export async function updateProfile(req: Request, res: Response) {
     console.log("PROFILE UPDATE ERROR:", error);
     res.status(500).json({ error: error.message });
   }
+
+  const user = await userModel.updateUserProfile(userUuid, data);
+ 
+
+  return sendSuccess(res, 200, user, {
+    message: "Profile updated successfully",
+  });
 }
+
+// ==========================================================
+// GET ALL USERS
+// GET /api/users/
+// ==========================================================
+
 export async function getAll(req: Request, res: Response) {
   try {
     const users = await userModel.findAllUsers();
@@ -223,6 +270,11 @@ export async function getAll(req: Request, res: Response) {
   }
 }
 
+// ==========================================================
+// GET OWN PROFILE
+// GET /api/users/profile
+// ==========================================================
+
 export async function getProfile(req: Request, res: Response) {
   try {
     const userUuid = req.user!.userUuid;
@@ -232,8 +284,18 @@ export async function getProfile(req: Request, res: Response) {
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
+
+  return sendSuccess(res, 200, user, {
+    message: "Profile fetched successfully",
+  });
 }
-//user delte
+
+
+// ==========================================================
+// DELETE USER
+// DELETE /api/users/:uuid
+// ==========================================================
+
 export async function deleteProfile(req: Request, res: Response) {
   try {
     // const userUuid = req.user!.userUuid;

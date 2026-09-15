@@ -1,6 +1,5 @@
 import { Router } from "express";
 import storeProductController from "../controllers/storeProduct.js";
-import { authMiddleware } from "../middleware/auth.js";
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -11,8 +10,8 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware);
 
+//create
 router.post(
   "/",
   authorizePermission("manage_inventory"),

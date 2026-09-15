@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import brandController from "../controllers/brand.js";
 
-import { authMiddleware } from "../middleware/auth.js";
 import { authorizePermission } from "../middleware/authorizePermission.js";
 import { validate } from "../middleware/validate.js";
 
@@ -14,8 +13,8 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware);
 
+//brand create
 router.post(
   "/",
   authorizePermission("manage_brands"),
@@ -23,8 +22,10 @@ router.post(
   brandController.create,
 );
 
+//  get list of brand brand 
 router.get("/", authorizePermission("manage_brands"), brandController.list);
 
+//brand 
 router.get(
   "/:uuid",
   authorizePermission("manage_brands"),
@@ -32,6 +33,7 @@ router.get(
   brandController.getBrand,
 );
 
+//brand 
 router.patch(
   "/:uuid",
   authorizePermission("manage_brands"),
@@ -40,6 +42,7 @@ router.patch(
   brandController.update,
 );
 
+//brand 
 router.delete(
   "/:uuid",
   authorizePermission("manage_brands"),
