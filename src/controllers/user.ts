@@ -100,6 +100,9 @@ export async function createUserByOwner(req: Request, res: Response) {
       where: {
         user_id: req.user!.userId,
         store_id: store.id,
+        role: {
+          name: "owner",
+        },
         deleted_at: null,
       },
     });
@@ -149,20 +152,14 @@ export async function createUserByOwner(req: Request, res: Response) {
 
       //  store_users yahan create hoga
       await tx.store_users.create({
-  data: {
-    user_id: user.id,
-    store_id: store.id,
-    role_id: role.id,
-  },
-});
+        data: {
+          user_id: user.id,
+          store_id: store.id,
+          role_id: role.id,
+        },
+      });
 
-await assignDefaultPermissions(
-  user.id,
-  role.name,
-  tx
-);
-
-
+      await assignDefaultPermissions(user.id, role.name, tx);
 
       return {
         uuid: user.uuid,
