@@ -50,7 +50,7 @@ router.patch(
   asyncHandler(updatedSupplier),
 );
 
-//delte//supplier
+//delete supplier
 router.delete(
   "/:uuid",
   authorizePermission("manage_suppliers"),

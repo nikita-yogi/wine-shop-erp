@@ -8,16 +8,16 @@ import brandRoutes from "./brand.js";
 import categoryRoutes from "./category.js";
 import productTypeRoutes from "./productType.js";
 import storeProductRoutes from "./storeProduct.js";
-import storeProductBatchRoutes from "./storeProductBatch.js";
 import customerRoutes from "./customers.js"
 import orderRoutes from "./order.js";
 import productRoutes from "./product.js"
+import storeBatchRoutes from "./storeProductBatch.js";
+import supplierRoutes from "./supplier.js";
+import purchaseOrderRoutes from  "./purchaseOrder.js";
 
 
 
 const router = Router();
-
-
 
 //auth routes
 router.use("/auth", authRoutes);
@@ -27,15 +27,6 @@ router.use("/users",authMiddleware, userRoutes);
 
 //role
 router.use("/roles", roleRoutes);
-router.use("/stores", storeRoutes);
-router.use("/brands", brandRoutes);
-router.use("/categories", categoryRoutes);
-router.use("/product-types", productTypeRoutes);
-router.use("/store-products", storeProductRoutes);
-router.use("/storeProduct-batch", storeProductBatchRoutes);
-router.use("/customer", customerRoutes );
-router.use("/orders", orderRoutes);
-router.use("/products", productRoutes);
 
 //stores routes
 router.use("/stores", authMiddleware ,storeRoutes);
@@ -55,13 +46,25 @@ router.use("/products", authMiddleware ,productRoutes);
 //store-products routes
 router.use("/store-products",authMiddleware , storeProductRoutes);
 
-//store-batch
-router.use("/store-product-batchs" ,authMiddleware,storeBatchRoutes)
+//store-batch rotes
+router.use("/store-product-batchs" ,authMiddleware,storeBatchRoutes);
+
 //supplier route
-router.use("/suppliers", authMiddleware ,supplierRouts);
+router.use("/suppliers", authMiddleware ,supplierRoutes);
 
 //purchaseOrder route
-router.use("/purchaseOrder", authMiddleware, purchaseOrderRouts);
+router.use("/purchaseOrder", authMiddleware, purchaseOrderRoutes);
+
+
+//customer routes
+ router.use("/customer",authMiddleware, customerRoutes );
+
+//order route
+router.use("/orders", authMiddleware,orderRoutes);
+
+
+
+
 
 
 export default router;

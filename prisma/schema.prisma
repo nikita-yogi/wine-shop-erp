@@ -550,7 +550,7 @@ model purchase_orders {
   final_amount                Decimal                       @default(0.00) @db.Decimal(12, 2)
   discount                    Decimal                       @default(0.00) @db.Decimal(12, 2)
   tax_amount                  Decimal                       @default(0.00) @db.Decimal(12, 2)
-  status                      String                        @db.VarChar(50)
+  status                      purchase_orders_status  @default(pending)                       
   payment_method              String?                       @db.VarChar(50)
   created_at                  DateTime                      @default(now()) @db.DateTime(0)
   deleted_at                  DateTime?                     @db.DateTime(0)
@@ -575,6 +575,8 @@ model supplier_meta {
 
   @@index([supplier_id], map: "fk_supplier_meta_supplier")
 }
+
+
 
 model suppliers {
   id                    Int                     @id @default(autoincrement())
@@ -605,4 +607,12 @@ enum stores_status {
   closed
   suspended
   license_expired
+}
+
+
+enum purchase_orders_status {
+  pending
+  received
+  delivered
+  cancelled
 }
