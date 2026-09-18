@@ -52,34 +52,18 @@ interface BatchInput {
   supplier_id?: number | null;
 }
 
-/**
- * Create a new batch for an already assigned store product.
- *
- * Flow:
- * Store + Product
- *      ↓
- * StoreProduct
- *      ↓
- * Batch
- */
-const create = (
-  store_id: number,
-  product_id: number,
-  data: BatchInput,
-) => {
+const create = (store_product_uuid: string, data: BatchInput) => {
   return prisma.$transaction(async (tx) => {
     // First check whether this product is already assigned
     // to this store.
-    const storeProduct = await tx.store_products.findUnique({
+    const storeProduct = await tx.store_products.findFirst({
       where: {
-        store_id_product_id: {
-          store_id,
-          product_id,
-        },
+        uuid: store_product_uuid,
+        deleted_at: null,
       },
     });
 
-    if (!storeProduct || storeProduct.deleted_at) {
+    if (!storeProduct) {
       throw new ApiError(
         400,
         "Assign this product to the store before adding a batch",

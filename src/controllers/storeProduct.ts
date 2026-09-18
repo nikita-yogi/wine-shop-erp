@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 
 import storeProductModel from "../models/storeProduct.js";
 import storeModel from "../models/store.js";
@@ -31,12 +32,24 @@ const create = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(404, "Product not found");
   }
 
+  try {
   const storeProduct = await storeProductModel.create(
     store.id,
     product.id,
   );
 
   return sendSuccess(res, 201, storeProduct);
+} catch (error) {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    throw new ApiError(409, "Store product already exists");
+  }
+
+  throw error;
+}
+
 });
 
 const list = asyncHandler(async (req: Request, res: Response) => {

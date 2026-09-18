@@ -2,13 +2,11 @@ import { z } from "zod";
 
 export const createStoreProductBatchSchema = z
   .object({
-    store_uuid: z.string().uuid(),
-    product_uuid: z.string().uuid(),
+    store_product_uuid: z.string().uuid(),
     batch_number: z.string().min(1).max(100),
     purchase_price: z.number().min(0),
     selling_price: z.number().min(0),
-    tax_rate: z.number().min(0).max(100).optional(),
-    batch_quantity: z.number().min(0),
+    quantity: z.number().min(0),
     expiry_date: z.iso.date().optional(),
     manufacture_date: z.iso.date().optional(),
   })
@@ -21,14 +19,29 @@ export const createStoreProductBatchSchema = z
     path: ["expiry_date"],
   });
 
-export const updateStoreProductBatchSchema = z.object({
-  purchase_price: z.number().min(0).optional(),
-  selling_price: z.number().min(0).optional(),
-  tax_rate: z.number().min(0).max(100).optional(),
-  batch_quantity: z.number().min(0).optional(),
-  expiry_date: z.iso.date().nullable().optional(),
-  manufacture_date: z.iso.date().nullable().optional(),
-});
+// export const updateStoreProductBatchSchema = z.object({
+//   purchase_price: z.number().min(0).optional(),
+//   selling_price: z.number().min(0).optional(),
+//   tax_rate: z.number().min(0).max(100).optional(),
+//   quantity: z.number().min(0).optional(),
+//   expiry_date: z.iso.date().nullable().optional(),
+//   manufacture_date: z.iso.date().nullable().optional(),
+// });
+
+export const updateStoreProductBatchSchema = z
+  .object({
+    purchase_price: z.number().min(0).optional(),
+    selling_price: z.number().min(0).optional(),
+    quantity: z.number().min(0).optional(),
+    expiry_date: z.iso.date().nullable().optional(),
+    manufacture_date: z.iso.date().nullable().optional(),
+  })
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    {
+      message: "At least one field is required",
+    },
+  );
 
 export const storeProductBatchParamsSchema = z.object({
   uuid: z.string().uuid(),
