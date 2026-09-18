@@ -151,6 +151,25 @@ CREATE TABLE `stores` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `store_admin` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `uuid` CHAR(36) NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `store_id` INTEGER NOT NULL,
+    `role_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `store_admin_uuid_key`(`uuid`),
+    INDEX `store_admin_user_id_idx`(`user_id`),
+    INDEX `store_admin_store_id_idx`(`store_id`),
+    INDEX `store_admin_role_id_idx`(`role_id`),
+    UNIQUE INDEX `store_admin_user_id_store_id_key`(`user_id`, `store_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `brands` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
@@ -283,6 +302,25 @@ CREATE TABLE `store_product_batches` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `store_users` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `uuid` CHAR(36) NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `store_id` INTEGER NOT NULL,
+    `role_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `store_users_uuid_key`(`uuid`),
+    INDEX `store_users_user_id_idx`(`user_id`),
+    INDEX `store_users_store_id_idx`(`store_id`),
+    INDEX `store_users_role_id_idx`(`role_id`),
+    UNIQUE INDEX `store_users_user_id_store_id_key`(`user_id`, `store_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `audit_logs` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
@@ -335,6 +373,7 @@ CREATE TABLE `customers` (
     `deleted_at` DATETIME(0) NULL,
 
     UNIQUE INDEX `uuid`(`uuid`),
+    UNIQUE INDEX `customers_phone_no_key`(`phone_no`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -450,7 +489,7 @@ CREATE TABLE `purchase_orders` (
     `final_amount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     `discount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     `tax_amount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-    `status` VARCHAR(50) NOT NULL,
+    `status` ENUM('pending', 'received', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
     `payment_method` VARCHAR(50) NULL,
     `created_at` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `deleted_at` DATETIME(0) NULL,
@@ -515,6 +554,15 @@ ALTER TABLE `session` ADD CONSTRAINT `user_sessions_userId_fkey` FOREIGN KEY (`u
 ALTER TABLE `password_otp` ADD CONSTRAINT `password_otp_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `store_admin` ADD CONSTRAINT `store_admin_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `store_admin` ADD CONSTRAINT `store_admin_store_id_fkey` FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `store_admin` ADD CONSTRAINT `store_admin_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `products` ADD CONSTRAINT `products_brand_id_fkey` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -537,6 +585,15 @@ ALTER TABLE `store_product_batches` ADD CONSTRAINT `store_product_batches_suppli
 
 -- AddForeignKey
 ALTER TABLE `store_product_batches` ADD CONSTRAINT `store_product_batches_store_product_id_fkey` FOREIGN KEY (`store_product_id`) REFERENCES `store_products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `store_users` ADD CONSTRAINT `store_users_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `store_users` ADD CONSTRAINT `store_users_store_id_fkey` FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `store_users` ADD CONSTRAINT `store_users_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `audit_logs` ADD CONSTRAINT `fk_audit_logs_store` FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

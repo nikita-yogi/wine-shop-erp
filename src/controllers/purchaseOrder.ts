@@ -9,6 +9,8 @@ import type {
 } from "../types/purchaseOrder.js";
 import type { Prisma } from "@prisma/client";
 
+import { purchase_orders_status } from "@prisma/client";
+import { ALLOWED_STATUS_TRANSITIONS } from "../constants/purchaseOrder.js";
 //PURCHASE ORDER
 
 export async function createpurchaseOrder(req: Request, res: Response) {
@@ -41,19 +43,31 @@ export async function purchaseOrderListHandler(req: Request, res: Response) {
   const { page, limit, status, supplier_uuid, store_uuid, from_date, to_date } = query;
 
   //step 1
-  const where: Prisma.purchase_ordersWhereInput = {
-    deleted_at: null,
-    ...(status && { status }),
-    ...(supplier_uuid && { supplier_uuid }),
-    ...(store_uuid && { store_uuid }),
-    ...((from_date || to_date) && {
-      purchase_date: {
-        ...(from_date && { gte: new Date(from_date) }),
-        ...(to_date && { lte: new Date(to_date) }),
-      },
-    }),
-  };
+  // const where: Prisma.purchase_ordersWhereInput = {
+  //   deleted_at: null,
+  //   ...(status && { status }),
+  //   ...(supplier_uuid && { supplier_uuid }),
+  //   ...(store_uuid && { store_uuid }),
+  //   ...((from_date || to_date) && {
+  //     purchase_date: {
+  //       ...(from_date && { gte: new Date(from_date) }),
+  //       ...(to_date && { lte: new Date(to_date) }),
+  //     },
+  //   }),
+  // };
 
+const where: Prisma.purchase_ordersWhereInput = {
+  deleted_at: null,
+  ...(status && { status: status as purchase_orders_status }),   // type cast add kiya
+  ...(supplier_uuid && { suppliers: { uuid: supplier_uuid } }),
+  ...(store_uuid && { stores: { uuid: store_uuid } }),
+  ...((from_date || to_date) && {
+    purchase_date: {
+      ...(from_date && { gte: new Date(from_date) }),
+      ...(to_date && { lte: new Date(to_date) }),
+    },
+  }),
+};
   //step 2.
   const skip = (page - 1) * limit;
 
@@ -69,4 +83,59 @@ export async function purchaseOrderListHandler(req: Request, res: Response) {
     totalPages: Math.ceil(total / limit),
   };
   return sendSuccess(res, 200, data, responseMeta);
+}
+
+
+export async function updatePurchaseOrderStatus(req: Request, res: Response) {
+  const uuid = getUuidParam(req);
+  const { status: newStatus } = req.body as { status: purchase_orders_status };
+
+  const po = await purchaseOrderModel.findByUuid(uuid);
+  if (!po) {
+    throw new ApiError(404, "Purchase order not found");
+  }
+
+  const currentStatus = po.status;
+  const allowedNext = ALLOWED_STATUS_TRANSITIONS[currentStatus] ?? [];
+
+  if (!allowedNext.includes(newStatus)) {
+    throw new ApiError(
+      409,
+      `Cannot change status from "${currentStatus}" to "${newStatus}". Allowed: ${
+        allowedNext.length > 0 ? allowedNext.join(", ") : "none"
+      }`
+    );
+  }
+
+  const updated = await purchaseOrderModel.updateStatus(uuid, newStatus);
+
+  return sendSuccess(res, 200, updated, {
+    message: `Purchase order status updated to ${newStatus}`,
+  });
+}
+
+export async function cancelPurchaseOrder(req: Request, res: Response) {
+  const uuid = getUuidParam(req);
+
+  const po = await purchaseOrderModel.findByUuid(uuid);
+  if (!po) {
+    throw new ApiError(404, "Purchase order not found");
+  }
+
+  if (po.status === purchase_orders_status.cancelled) {
+    throw new ApiError(409, "Purchase order is already cancelled");
+  }
+
+  if (po.status === purchase_orders_status.delivered) {
+    throw new ApiError(409, "Cannot cancel a delivered purchase order");
+  }
+
+  const cancelled = await purchaseOrderModel.updateStatus(
+    uuid,
+    purchase_orders_status.cancelled
+  );
+
+  return sendSuccess(res, 200, cancelled, {
+    message: "Purchase order cancelled successfully",
+  });
 }

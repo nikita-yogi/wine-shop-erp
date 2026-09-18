@@ -3,7 +3,7 @@ import type {
   CreatePurchaseOrderInput,
   purchaseUuid,
 } from "../types/purchaseOrder.js";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, purchase_orders_status } from "@prisma/client";
 
 export const purchaseOrderModel = {
   createWithItems: (data: CreatePurchaseOrderInput) => {
@@ -62,7 +62,6 @@ export const purchaseOrderModel = {
           payment_method: data.payment_method,
         }),
 
-        status: "pending",
         purchase_order_items: {
           create: itemsWithSubtotal,
         },
@@ -110,4 +109,16 @@ export const purchaseOrderModel = {
       where,
     });
   },
+
+  updateStatus: (uuid: string, status: purchase_orders_status) => {   // string ki jagah enum type
+  return prisma.purchase_orders.update({
+    where: { uuid },
+    data: { status },
+    include: {
+      purchase_order_items: { where: { deleted_at: null } },
+      suppliers: { select: { name: true, uuid: true } },
+      stores: { select: { name: true, uuid: true } },
+    },
+  });
+},
 };

@@ -5,12 +5,15 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   createPurchaseOrderSchema,
   purchaseOrderUuidParamSchema ,
-  PurchaseOrderListQuerySchema
+  PurchaseOrderListQuerySchema,
+  updatePurchaseOrderStatusSchema
 } from "../validations/purchaseOrder.js";
 import {
   createpurchaseOrder,
    getpurchaseOrder,
-   purchaseOrderListHandler
+   purchaseOrderListHandler,
+   updatePurchaseOrderStatus ,
+   cancelPurchaseOrder
 
 } from "../controllers/purchaseOrder.js";
 
@@ -37,5 +40,21 @@ router.get("/",
   asyncHandler( purchaseOrderListHandler)
 );
 
+
+
+//update PurchaseOrder Status :: cancel, pending, received, delivered
+router.patch(
+  "/:uuid/status",
+  authorizePermission("manage_purchases"),
+  validate(purchaseOrderUuidParamSchema, "params"),
+  validate(updatePurchaseOrderStatusSchema, "body"),
+  asyncHandler(updatePurchaseOrderStatus)
+);
+router.patch(
+  "/:uuid/cancel",
+  authorizePermission("manage_purchases"),
+  validate(purchaseOrderUuidParamSchema, "params"),
+  asyncHandler(cancelPurchaseOrder)
+);
 
 export default router;

@@ -19,8 +19,6 @@ import purchaseOrderRoutes from  "./purchaseOrder.js";
 
 const router = Router();
 
-
-
 //auth routes
 router.use("/auth", authRoutes);
 

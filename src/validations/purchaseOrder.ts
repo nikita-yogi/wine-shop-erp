@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { purchase_orders_status } from "@prisma/client";
 
 export const purchaseOrderItemSchema = z.object({
   product_uuid: z.string().uuid(),
@@ -34,4 +35,9 @@ export const PurchaseOrderListQuerySchema = z.object({
   store_uuid:  z.string().uuid().optional(),
   from_date: z.string().optional(),
   to_date: z.string().optional(),
-})
+});
+
+
+export const updatePurchaseOrderStatusSchema = z.object({
+  status: z.nativeEnum(purchase_orders_status),
+});
