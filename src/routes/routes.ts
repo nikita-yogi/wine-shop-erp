@@ -11,7 +11,7 @@ import storeProductRoutes from "./storeProduct.js";
 import customerRoutes from "./customers.js"
 import orderRoutes from "./order.js";
 import productRoutes from "./product.js"
-import storeBatchRoutes from "./storeProductBatch.js";
+import storeProductBatchRoutes from "./storeProductBatch.js";
 import supplierRoutes from "./supplier.js";
 import purchaseOrderRoutes from  "./purchaseOrder.js";
 
@@ -47,7 +47,7 @@ router.use("/products", authMiddleware ,productRoutes);
 router.use("/store-products",authMiddleware , storeProductRoutes);
 
 //store-batch rotes
-router.use("/store-product-batchs" ,authMiddleware,storeBatchRoutes);
+router.use("/store-product-batches" ,authMiddleware,storeProductBatchRoutes);
 
 //supplier route
 router.use("/suppliers", authMiddleware ,supplierRoutes);
@@ -61,10 +61,5 @@ router.use("/purchaseOrder", authMiddleware, purchaseOrderRoutes);
 
 //order route
 router.use("/orders", authMiddleware,orderRoutes);
-
-
-
-
-
 
 export default router;

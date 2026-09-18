@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
+import { Prisma } from "@prisma/client";
+
 import storeProductBatchModel from "../models/storeProductBatch.js";
-import storeModel from "../models/store.js";
-import productModel from "../models/product.js";
+
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/sendSuccess.js";
@@ -16,30 +17,35 @@ const toDate = (v: string | null): Date | null => (v ? new Date(v) : null);
 const create = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as CreateStoreProductBatchDTO;
 
-  const [store, product] = await Promise.all([
-    storeModel.findByUuid(input.store_uuid),
-    productModel.findByUuid(input.product_uuid),
-  ]);
+  
 
-  if (!store) throw new ApiError(404, "Store not found");
-  if (!product) throw new ApiError(404, "Product not found");
 
-  const batch = await storeProductBatchModel.create(store.id, product.id, {
+  try{
+  const batch = await storeProductBatchModel.create( input.store_product_uuid, {
     batch_number: input.batch_number,
     purchase_price: input.purchase_price,
     selling_price: input.selling_price,
 
-     ...(input.tax_rate !== undefined && {
-    tax_rate: input.tax_rate,
-  }),
-
-    quantity: input.batch_quantity,
+    quantity: input.quantity,
     expiry_date: toDate(input.expiry_date ?? null),
 
     manufacture_date: toDate(input.manufacture_date ?? null),
   });
-
+  
   return sendSuccess(res, 201, batch);
+}catch (error) {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    throw new ApiError(
+      409,
+      "Batch number already exists for this store product",
+    );
+  }
+
+  throw error;
+}
 });
 
 const list = asyncHandler(async (req: Request, res: Response) => {
@@ -85,8 +91,7 @@ const update = asyncHandler(async (req: Request, res: Response) => {
   const updateData: {
     purchase_price?: number;
     selling_price?: number;
-    tax_rate?: number;
-    batch_quantity?: number;
+    quantity?: number;
     expiry_date?: Date | null;
     manufacture_date?: Date | null;
   } = {};
@@ -99,12 +104,8 @@ const update = asyncHandler(async (req: Request, res: Response) => {
     updateData.selling_price = input.selling_price;
   }
 
-  if (input.tax_rate !== undefined) {
-    updateData.tax_rate = input.tax_rate;
-  }
-
-  if (input.batch_quantity !== undefined) {
-    updateData.batch_quantity = input.batch_quantity;
+  if (input.quantity !== undefined) {
+    updateData.quantity = input.quantity;
   }
 
   if (input.expiry_date !== undefined) {
