@@ -6,3 +6,4 @@ prisma/migration/schema.prisma
 .claude/
 .windsurf/
 dist/
+skills-lock.json
