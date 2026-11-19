@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Divecho-Technologies/wine-shop.git"
+    "url": "git+https://github.com/nikita-yogi/wine-shop-erp.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Divecho-Technologies/wine-shop/issues"
+    "url": "https://github.com/nikita-yogi/wine-shop-erp/issues"
   },
-  "homepage": "https://github.com/Divecho-Technologies/wine-shop#readme",
+  "homepage": "https://github.com/nikita-yogi/wine-shop-erp#readme",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
