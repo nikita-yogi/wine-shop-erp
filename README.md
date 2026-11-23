@@ -17,15 +17,15 @@ Based on the git history:
 
 | Area | Built by |
 |---|---|
-| Orders, stores, store products, store product batches, products, brands, categories, product types, customers | **Nikita Yogi** |
+| Orders, stores, store products, store product batches, products | **Nikita Yogi** |
+| Brands, categories, product types, customers | Shared (Nikita Yogi and teammate) |
 | Authentication, users, roles and permissions, JWT, email, suppliers, purchase orders | Teammate |
-
 Final merges were handled by the tech lead.
 
 ## Run locally
 <!-- VERIFY these steps on a fresh clone before making the repo public -->
 ```bash
-git clone <this repo>
+git clone https://github.com/nikita-yogi/wine-shop-erp.git
 cd wine-shop-erp
 npm install
 cp .env.example .env     # then fill in your own values
