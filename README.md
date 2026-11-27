@@ -1,6 +1,6 @@
 # Wine Shop ERP (Backend)
 
-Backend for a multi-store wine shop ERP: stores, products, expiry-tracked stock batches and orders, with role-based access.
+Backend for a multi-store wine shop ERP: an inventory and order management system with stores, products, expiry-tracked stock batches and orders.
 
 > **Team project built at DivEcho Technologies (May 2026 - Oct 2026).** Shared here with the tech lead's permission. See [Who built what](#who-built-what).
 
@@ -8,8 +8,9 @@ Backend for a multi-store wine shop ERP: stores, products, expiry-tracked stock 
 Node.js, Express, TypeScript, Prisma ORM, MySQL, Zod, JWT
 
 ## What it does
-- **Orders:** an order, its items and a payment transaction record are written together in one database transaction. Stock is deducted per batch with an atomic conditional update, so an order fails (and rolls back) if there is not enough stock. Expiry and store access are validated.
-- **Stores and stock:** store CRUD, store-wise products, and batches with expiry dates, with per-store admin/staff access and soft deletes.
+- **Orders:** an order, its items and a payment transaction record are written together in one database transaction. Stock is deducted per batch with an atomic conditional update, so an order fails (and rolls back) if there is not enough stock. Batch expiry is validated.
+- 
+- **Stores and stock:** store CRUD, store-wise products, and batches with expiry dates, with soft deletes.
 - **Structure:** routes -> controllers -> models, Zod validation for request bodies, UUID-based public IDs, centralized error handling.
 
 ## Who built what
