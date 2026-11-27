@@ -9,7 +9,6 @@ Node.js, Express, TypeScript, Prisma ORM, MySQL, Zod, JWT
 
 ## What it does
 - **Orders:** an order, its items and a payment transaction record are written together in one database transaction. Stock is deducted per batch with an atomic conditional update, so an order fails (and rolls back) if there is not enough stock. Batch expiry is validated.
-- 
 - **Stores and stock:** store CRUD, store-wise products, and batches with expiry dates, with soft deletes.
 - **Structure:** routes -> controllers -> models, Zod validation for request bodies, UUID-based public IDs, centralized error handling.
 
@@ -21,10 +20,12 @@ Based on the git history:
 | Orders, stores, store products, store product batches, products | **Nikita Yogi** |
 | Brands, categories, product types, customers | Shared (Nikita Yogi and teammate) |
 | Authentication, users, roles and permissions, JWT, email, suppliers, purchase orders | Teammate |
+
 Final merges were handled by the tech lead.
 
 ## Run locally
-<!-- VERIFY these steps on a fresh clone before making the repo public -->
+Make sure MySQL is running and `DATABASE_URL` points to an empty database.
+
 ```bash
 git clone https://github.com/nikita-yogi/wine-shop-erp.git
 cd wine-shop-erp
@@ -38,5 +39,3 @@ Environment variables used by the code: `DATABASE_URL`, `ACCESS_TOKEN_SECRET`, `
 
 ## API modules
 `auth`, `user`, `role`, `store`, `storeProduct`, `storeProductBatch`, `product`, `brand`, `category`, `productType`, `customers`, `supplier`, `purchaseOrder`, `order`
-
-<!-- ADD: a Postman collection or a short list of main endpoints, and one screenshot of a successful order response -->
